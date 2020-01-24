@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+#my-custom-class {
+  color: red;
+}
+
+.center-it {
+	margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+body {
+  font-size: 200%;
+  text-align: center;
+  font-family: Libre Baskerville;
+}
+
+p {
+  font-weight: normal;
+  margin-bottom: 0.3em;
+  margin-top: 0.3em;
+  text-align: left;
+}
+
+pre {
+  text-align: center;
+}
+
+h1, h2, h3, h4 {
+  font-weight: normal;
+  margin-bottom: 0.3em;
+  margin-top: 0.3em;
+}
+
+tt {
+  font-size: 125;
+}
+
+ul {
+    width: 50%;
+    margin: auto;
+    list-style-position: inside;
+}
+
+li {
+  font-family: serif;
+  font-weight: normal;
+  margin-bottom: 0.3em;
+  margin-top: 0.3em;
+  padding-left: 0.3em;
+  line-height: 1.8em;
+  text-align: left;
+}
+
+a {
+  text-decoration: none;
+  color: #5c58cc;
+}
+
+.step.center_text p {
+  text-align: center;
+}
+
+.impress-enabled .step {
+  margin: 0;
+  opacity: 0;
+  /* hide when not active */
+  -webkit-transition: opacity 1s 0.5s;
+  -moz-transition: opacity 1s 0.5s;
+  -ms-transition: opacity 1s 0.5s;
+  -o-transition: opacity 1s 0.5s;
+  transition: opacity 1s 0.5s;
+}
+
+.impress-enabled .step.always {
+  opacity: 1;
+}
+
+.impress-enabled .step.active {
+  opacity: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.step img.design {
+  width: 100%;
+}
+
+.step img.mycourses {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-top: -3.9em;
+  margin-left: -3.5em;
+  width: 7em;
+}
+
+#console .header, #console .footer {
+  display: none;
+}
+
+.header img {
+  opacity: 0.2;
+  width: 25%;
+  position: absolute;
+  left: 0;
+}
+
+.footer {
+  position: absolute;
+  bottom: 2%;
+  left: 2%;
+  right: 2%;
+  font-size: 1.5vw;
+}
+
+.footer img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30%;
+}
+
+/* COLUMN SYSTEM - WIP */
+/*
+
+<div class="row">
+    <div class="column">
+        <p>Some text here in column 1</p>
+    </div>
+    <div class="column">
+        <p>Lorem ipsum dolor sit amet, nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+</div>
+
+*/
+
+.step {
+    /* makes slides larger. Should work with any resolution. If slides seem too big adjust these settings.*/
+    width: calc(100vw - 100px);
+    padding: calc(100vh / 4) 0px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: auto;
+}
+
+.column img {
+  align-self: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+/* TABLE STYLES */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+th p {
+  font-weight: bold;
+  text-align: center;
+}

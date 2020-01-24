@@ -1,0 +1,16 @@
+*/__pycache__/
+initialize_presentation.py*
+*.rst
+*/pdf
+*venv
+.idea
+.settings
+.project
+.pydevproject
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+*~
+*.sw[op]
+images
+*.egg-info

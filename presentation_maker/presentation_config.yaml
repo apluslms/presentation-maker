@@ -1,0 +1,79 @@
+# Configuration file for creating presentation from rst files which contains
+# Point-of-interest directives
+# How to use:
+# You need to fill presentation_start fields, images, first_slide and last_slide content.
+# first_slide and other_slide has good default values so it is not mandatory to change these values.
+# files fields are the most important fields in order to make presentation making to work.
+# Those fields which are commented are using default values. Default values should work out of the box.
+
+presentation_start:
+  title: Title
+  subtitle: Subtitle
+  author: first name last name
+  description: description
+
+
+slide_options:
+   data-transition-duration: 800
+   skip-help: true
+
+
+# if you want to change defaults use these settings below. These values will overwrite defaults.
+# make_pdf: (True, False)
+# course_path: path to the root of course directory. Which has index.rst in it.
+# overwrite_earlier_versions : overwrites earlier versions of presentations. (True, False)
+# hovercraft_target_dir: The directory where the hovercraft presentation (index.html) is saved. Will be created if it does not exist.
+#   It will be inside of _build dir
+# filename: name of the presentation, you want to create. Needs to be .rst
+# course_rounds: allows you to select which course rounds are included in presentation
+#   If you want all rounds write: course_rounds: all
+# rst2pdf: default method for making PDF. False for deck2pdf (html to pdf)
+#   False = deck2pdf, True = rst2pdf
+files:
+  #filename: _build/presentation.rst
+  #css: css/presentation.css
+  #course_path: .
+  #make_pdf: True
+  #hovercraft_target_dir: _build/presentation
+  #course_rounds: all
+  #rst2pdf: True
+
+
+# header and footer can be text. But images work too.
+# you can hide header and footer by setting False in both header_visible and footer_visible.
+# If you want to add footer image. Do it like this:
+# footer: ".. image:: images/photo.png"
+# remember to add quotes to image path and make sure path is correct.
+header_footer:
+  header: Example header
+  header_visible: False
+  footer: Aalto-yliopisto 2019
+  footer_visible: True
+
+# impress.js fields can be applied.
+first_slide:
+  data-scale: 1
+  data-x: r4000
+  class: center_text
+
+
+# impress.js fields can be applied. Affects all the other slides except first and last.
+other_slides:
+  data-scale: 1
+  data-x: r4000
+  class: center_text
+
+# Last slide of the presentation
+
+last_slide:
+  # impress.js fields can be applied as shown below in comments
+  data-scale: 1
+  class: center_text
+  # in content: keep indentation and '|' character at start
+  # Last slide content. Use normal rst formatting
+  content: |
+
+    Last slide
+    ----------
+
+    `sample link <https://www.aalto.fi>`_
