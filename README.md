@@ -3,7 +3,7 @@
 ## Contents
 
 - [Introduction](#introduction)
-      - [Which method I should use](#which-method-i-should-use)
+  * [Which method I should use](#which-method-i-should-use)
 - [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installing](#installing)
@@ -56,7 +56,7 @@ Since Hovercraft creates only HTML presentations, other solutions for PDF creati
 1. First method is with rst2pdf.
 2. Second method is deck2pdf which uses presentation RST file directly and also uses impress.js (same as hovercraft, so it is more compatible with this method) 
  
-#### Which method I should use
+## Which method I should use
 Each method has its downsides. But deck2pdf is recommended since it is more compatible.
 
 - **deck2pdf** generates nice pdf files but converts pages to images. Texts cannot be copied and links no longer work.
