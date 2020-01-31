@@ -3,17 +3,16 @@
 ## Contents
 
 - [Introduction](#introduction)
-     - [Which method should I use](#which-method-should-i-use)
+      - [Which method I should use](#which-method-i-should-use)
 - [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installing](#installing)
-    + [Clone Presentation-maker Git repository.](#clone-presentation-maker-git-repository)
     + [Edit course.yml](#edit-courseyml)
     + [Ready to make presentations](#ready-to-make-presentations)
 - [Presentation settings](#presentation-settings)
   * [Configuration file settings](#configuration-file-settings)
   * [Course parameters](#course-parameters)
-    + [Changing title, subtitle, author and other things](#changing-title-subtitle-author-and-other-things)
+    + [Changing title, subtitle, author and other things](#changing-title--subtitle--author-and-other-things)
     + [Selecting course rounds for presentation](#selecting-course-rounds-for-presentation)
     + [All parameters](#all-parameters)
 - [Making presentations](#making-presentations)
@@ -35,17 +34,17 @@
     + [Local video file](#local-video-file)
         * [Example](#example-1)
   * [Audio file](#audio-file)
-  * [JSVEE/JSAV animations](#JSVEE/JSAV-animations)
+  * [JSVEE/JSAV animations](#jsvee-jsav-animations)
 - [Tips for creating stuff](#tips-for-creating-stuff)
-  * [Easier (and faster) way to create tables](#easier-and-faster-way-to-create-tables)
+  * [Easier (and faster) way to create tables](#easier--and-faster--way-to-create-tables)
     + [List table directive](#list-table-directive)
     + [CSV table directive](#csv-table-directive)
 - [Extras](#extras)
   * [Build a container](#build-a-container)
 - [Troubleshooting](#troubleshooting)
   * [presentation_config.yaml not found](#presentation-configyaml-not-found)
-  * [Built With](#built-with)
-  * [Authors](#authors)
+- [Built With](#built-with)
+- [Authors](#authors)
 
 # Introduction
 
@@ -87,6 +86,7 @@ extensions = [
 'sphinx.ext.ifconfig',
 'aplus_setup',
 'point_of_interest',
+'media'
 ]
 ```
 - You will need POI in your A+ course material.
@@ -105,14 +105,6 @@ This text is no longer part of POI.
 
 ## Installing
 Open terminal and navigate somewhere where you would like to download Presentation Maker.
-
-### Clone Presentation-maker Git repository.
-
-```
-# In terminal
-git clone https://github.com/Aalto-LeTech/presentation-maker
-
-```
 
 ### Edit course.yml
 - Navigate to the root of your course directory
@@ -189,7 +181,7 @@ Best way to use Presentation Maker is to set all settings by configuration file 
     ```
 4. It is recommended to keep files commented out like this. If you ever need to change any of these, just uncomment the line and add changes.
 
-    If you want to create pdf (deck2pdf) every time. You have to uncomment `make_pdf` and `rest2pdf`. Then set `make_pdf: True` and `rst2pdf: False`
+    If you want to create pdf (deck2pdf) every time. You have to uncomment `make_pdf` and `rst2pdf`. Then set `make_pdf: True` and `rst2pdf: False`
 
     Remember to save the file.
     
@@ -685,7 +677,7 @@ You can use style the table content like any other RST content.
 ```
 # in presentation-maker directory
 
-docker build -f docker/compile/Dockerfile -t apluslms/compile-presentation:latest .
+docker build -f docker/compile/Dockerfile -t apluslms/presentation-maker:latest .
 ```
 
 # Troubleshooting
@@ -707,13 +699,13 @@ In this case you may need to edit `course.yml` file and add path to the configur
 
 ```
 
-## Built With
+# Built With
 
 * [Hovercraft](https://hovercraft.readthedocs.io/en/latest/) - For creating HTML presentations from RST with impress.js
 * [Deck2Pdf](https://github.com/melix/deck2pdf) - For creating PDF from HTML file
 * [rst2Pdf](https://github.com/rst2pdf/rst2pdf) - For creating PDF file from RST
 
-## Authors
+# Authors
 
-* **Juuso Vuorenmaa** - *Initial work* - [Juuso Vuorenmaa](https://github.com/zunde)
+* **Juuso Vuorenmaa** - *Initial work* - [zunde](https://github.com/zunde)
 
