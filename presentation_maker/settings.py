@@ -1,5 +1,6 @@
 """
-All initializations and settings.
+All initializations and settings. You do not need to change any of these values, unless you are making some changes to the . These are just presets and will be
+changed while running the code.
 """
 from . import custom_formatter as cf
 from pathlib import Path
@@ -15,6 +16,14 @@ not_in_slides = ":not_in_slides"
 poi = 'point-of-interest::'
 newcol = "::newcol"
 note = ".. note::"
+
+# language settings
+default_language = "fi"
+# for the variable name
+language = "language"
+
+# verbose, set true with verbose command line parameter.
+verbose = False
 
 # like global variables. Flags for columns and background images.
 columns = False

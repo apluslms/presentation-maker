@@ -2,6 +2,8 @@
 This script creates list of paths to all course materials (RST) in correct order.
 """
 
+import re
+
 from pathlib import Path
 
 from . import presentation_maker as pm
@@ -45,13 +47,22 @@ def read_index_rst(path_to_index):
             for line in reader.readlines():
                 if ".. aplusmeta::" in line:
                     aplusmeta = True
+                if ":caption:" in line:
+                    # ignore
+                    pass
                 if "toctree::" in line:
                     start = True
                     aplusmeta = False
                 else:
                     if start and not aplusmeta:
                         line = line.rstrip().lstrip()
-                        if "maxdepth" in line:
+                        if re.search('^\..$', line):
+                            # if line has only ..
+                            # toctree no longer continues
+                            break
+                        elif not re.search('[a-zA-Z]', line):
+                            pass
+                        elif ("maxdepth" in line) or ("|" in line):
                             pass
                         elif not line:
                             # empty line
@@ -78,7 +89,7 @@ def read_index_rst(path_to_index):
     return indexes
 
 
-def build_paths(index_path, paths):
+def build_paths(index_path, paths, file):
     """
     Builds course list from index.rst.
 
@@ -89,13 +100,12 @@ def build_paths(index_path, paths):
     # dictionary does not work since it doesn't keep the order
 
     filestructure = []
-
     for path in paths:
         # this assumes that each folder contains index.rst
         path = Path(path)
         if path.name == "index":
             path = path.with_suffix(".rst")
-        if index_path.name == "index.rst":
+        if index_path.name == file:
             index_path = index_path.parent
         # with open(str(index_path / path), 'r') as reader:
         #     # opens index.rst in all the folders
@@ -104,7 +114,7 @@ def build_paths(index_path, paths):
     return filestructure
 
 
-def remake_paths(index_path, paths):
+def remake_paths(index_path, paths, language):
     """
     Creates paths for each .rst file.
 
@@ -112,25 +122,48 @@ def remake_paths(index_path, paths):
     """
     index_path = index_path.parent
     path_list = []
+
     for folder, files in paths:
         folder = folder.parent
         for file in files:
             p = Path(index_path / folder / (file + ".rst"))
-            path_list.append(str(p))
+            # NOTE: This works when system uses 'language suffix' naming convention. e.g. example_file_en.rst
+            # uncomment to use it, instead of this path dependent language selection.
+            # if language == "fi":
+            #     # Here assumes that files that are written in finnish do not have _fi ending. Currently it does not.
+            #     p = Path(index_path / folder / (file + ".rst"))
+            # else:
+            #     # checking if the file already has a language suffix e.g. '_en' in the name of the file
+            #     if ("_" + language) not in file:
+            #         # file do not have language suffix and if it does it will not make another
+            #         f = file + "_" + language + ".rst"
+            #         p = Path(index_path / folder / f)
+            if p.exists():
+                # some files may not exist even if they are in the index
+                # or files have naming discrepancy.
+                path_list.append(str(p))
+            else:
+                if settings.verbose:
+                    settings.logger.info("File {} not found, skipping...".format(f))
     return path_list
 
 
-def create_paths(rounds, course_path):
+def create_paths(rounds, course_path, language):
     """
     Main function. Calls all the other functions in pathfinder.
 
     :return: list of paths to each .RST file.
     """
-    file = "index.rst"
+    # if language is set then index.rst file has different ending depending on the language e.g index_en.rst
+    if not language:
+        file = "index.rst"
+    else:
+        file = "index_" + language + ".rst"
+
     index_path = Path(course_path) / file
 
     paths = read_index_rst(index_path)
     paths = filter_rounds(rounds, paths)
-    structure = build_paths(index_path, paths)
-    path_list = remake_paths(index_path, structure)
+    structure = build_paths(index_path, paths, file)
+    path_list = remake_paths(index_path, structure, language)
     return path_list

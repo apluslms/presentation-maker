@@ -529,14 +529,15 @@ def set_defaults(config, config_path, css_path):
     default_course_rounds = settings.default_course_rounds
     default_rst2pdf = settings.default_rst2pdf
     default_course_path = str(Path.cwd())
+    default_language = settings.default_language
     defaults = {settings.filename: default_filename, settings.css: default_css,
                 settings.course_path: default_course_path, settings.make_pdf: default_make_pdf,
                 settings.hovercraft_target_dir: default_hovercraft_target_dir,
-                settings.course_rounds: default_course_rounds, settings.rst2pdf: default_rst2pdf}
-
+                settings.course_rounds: default_course_rounds, settings.rst2pdf: default_rst2pdf,
+                settings.language: default_language}
+    settings.logger.info("Setting default values...")
     if not config[master_key]:
         # if no settings were defined in presentation_config.yaml then use only defaults in files
-        settings.logger.info("Using default settings for the files and paths.")
         config.update({master_key: {settings.filename: default_filename,
                                     settings.css: css_path,
                                     settings.make_pdf: default_make_pdf,
@@ -544,21 +545,20 @@ def set_defaults(config, config_path, css_path):
                                     settings.rst2pdf: default_rst2pdf,
                                     settings.course_path: default_course_path,
                                     settings.config_name: config_path,
-                                    settings.hovercraft_target_dir: default_hovercraft_target_dir
+                                    settings.hovercraft_target_dir: default_hovercraft_target_dir,
+                                    settings.language: default_language
                                     }})
 
     else:
-        print_dashes()
-        settings.logger.info("These settings are set via configuration file.")
-
         for key, default_value in defaults.items():
             if not config[master_key].get(key):
                 # add default default_value, since it is not in config
                 config[master_key][key] = default_value
+
             else:
                 # these are from configuration file
                 # keep older default_value, it has higher priority than default value
-                settings.logger.info("{}: {}".format(key, config[master_key][key]))
+                # settings.logger.info("from config {}: {}".format(key, config[master_key][key]))
                 if key == settings.make_pdf:
                     if config[master_key].get(settings.make_pdf):
                         # rst2pdf method does not do anything if make_pdf is false
@@ -619,11 +619,15 @@ def selected_rounds(dictionary):
     :return: selected rounds in list. e.g. [1,3,5,6]
     """
     try:
-        rounds = dictionary.get(settings.files)[settings.course_rounds]
+        rounds = int(dictionary.get(settings.files)[settings.course_rounds])
     except (TypeError, KeyError):
         settings.logger.warning("Course rounds not set in presentation_config.yaml. Selecting all course rounds for "
                                 "presentation.")
         return settings.default_course_rounds
+    except ValueError:
+        # rounds was something else than just a number, continuing...
+        rounds = dictionary.get(settings.files)[settings.course_rounds]
+
     parsed_rounds = []
 
     if isinstance(rounds, int):
@@ -648,6 +652,11 @@ def selected_rounds(dictionary):
         # filtering same numbers. Changing variable to set and back to list.
         parsed_rounds = set(parsed_rounds)
         parsed_rounds = list(parsed_rounds)
+        if settings.verbose:
+            if parsed_rounds == [-1]:
+                settings.logger.info("all rounds included in the presentation")
+            else:
+                settings.logger.info("rounds {} included in the presentation".format(parsed_rounds))
         return parsed_rounds
 
 
@@ -686,6 +695,7 @@ def cmd_line_parsing():
     file_group.add_argument("-p", "--pdf", action="store_true", help="enable pdf creation")
     file_group.add_argument("-m", "--html2pdf", action="store_true", help="enables deck2pdf (html to pdf) as a pdf "
                                                                           "creation method")
+    file_group.add_argument("-l", "--language", help="select language for the presentation. e.g. 'en' or 'fi'")
     file_group.add_argument("-r", "--rounds", help="select which course rounds will be included to presentation. e.g. "
                                                    "1-3, 5")
     parser.add_argument("-d", "-direct", metavar="<name of presentation.rst>", help="creates presentation directly "
@@ -694,6 +704,7 @@ def cmd_line_parsing():
     args = parser.parse_args()
 
     if args.verbose:
+        settings.verbose = True
         settings.logger.info("Following parameters were used:")
         for arg in vars(args):
             if getattr(args, arg):
@@ -739,6 +750,8 @@ def set_parameters(dictionary, args, params):
             dictionary[settings.files][settings.course_path] = args.course_path
         if args.config_path:
             dictionary[settings.files][settings.config_name] = args.config_path
+        if args.language:
+            dictionary[settings.files][settings.language] = args.language
 
         if settings.presentation_start in dictionary:
             if args.title:
@@ -807,8 +820,7 @@ def create_presentation(args):
             rst_file = raw_dict[settings.files][settings.filename]  # needs to be reassigned if it was changed via cmd
             # arguments
             course_path = raw_dict[settings.files][settings.course_path]
-
-        write_rst(raw_dict, params, rst_file, pathfinder.create_paths(selected_rounds(raw_dict), course_path), ending,
+        write_rst(raw_dict, params, rst_file, pathfinder.create_paths(selected_rounds(raw_dict), course_path, raw_dict[settings.files][settings.language]), ending,
                   last_slide_content, transition, other_transitions, course_path, step_num)
         presentation_folder = hover.run(rst_file, raw_dict, build_dir)
         create_pdf.create(raw_dict, rst_file, presentation_folder, build_dir, code_dir)
@@ -818,15 +830,16 @@ def create_presentation(args):
 
 def initialization():
     """
-    Makes all sorts of initializations in order to make everything work as easily as possible.
+    Makes initializations in order to make everything work as easily as possible.
 
     :return:
     """
-    settings.logger.info("Making initializations")
+    settings.logger.info("Making initializations...")
     # creating _build if it is not created yet
     create_dir(settings.build_dir)
     # config file will be copied to _build directory for easier access. Especially when using with roman.
     copy_file(settings.code_dir / settings.config_name, settings.build_dir / settings.config_name)
+    settings.logger.info("Initializations OK.")
 
 
 def main():

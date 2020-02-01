@@ -29,6 +29,8 @@ slide_options:
 #   If you want all rounds write: course_rounds: all
 # rst2pdf: default method for making PDF. False for deck2pdf (html to pdf)
 #   False = deck2pdf, True = rst2pdf
+# language for selecting the language for the course. If it set to None then it assumes it has only one language and uses normal index.rst naming instead of index_en.rst
+
 files:
   #filename: _build/presentation.rst
   #css: css/presentation.css
@@ -37,6 +39,7 @@ files:
   #hovercraft_target_dir: _build/presentation
   #course_rounds: all
   #rst2pdf: True
+  language: fi
 
 
 # header and footer can be text. But images work too.
