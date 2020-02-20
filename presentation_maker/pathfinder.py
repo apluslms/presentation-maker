@@ -79,8 +79,9 @@ def read_index_rst(path_to_index):
             raise Exception("Error - index.rst is not not valid. '.. toctree:: missing'")
 
     except FileNotFoundError:
-        settings.logger.info("Error - No such file: {} \n".format(str(path)))
+        settings.logger.error("Error - No such file: {} \n".format(str(path)))
         settings.logger.info("Make sure you are running this from A+ course directory where index.rst is located.")
+        settings.logger.info("Are you trying to use unsupported languages?\n".format(str(path)))
         pm.exiting()
     except PermissionError as pe:
         settings.logger.error("Permission error while handling {}\n"
@@ -100,10 +101,11 @@ def build_paths(index_path, paths, file):
     # dictionary does not work since it doesn't keep the order
 
     filestructure = []
+
     for path in paths:
         # this assumes that each folder contains index.rst
         path = Path(path)
-        if path.name == "index":
+        if path.name == "index" or file:
             path = path.with_suffix(".rst")
         if index_path.name == file:
             index_path = index_path.parent
@@ -154,11 +156,12 @@ def create_paths(rounds, course_path, language):
 
     :return: list of paths to each .RST file.
     """
-    # if language is set then index.rst file has different ending depending on the language e.g index_en.rst
-    if not language:
+    # if language indexes do not exist (course do not have languages) then index.rst file is being used.
+    # If index_language.rst exist then it will be used
+
+    file = "index_" + language + ".rst"
+    if not Path(file).exists():
         file = "index.rst"
-    else:
-        file = "index_" + language + ".rst"
 
     index_path = Path(course_path) / file
 

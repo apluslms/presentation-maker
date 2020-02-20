@@ -39,7 +39,7 @@ files:
   #hovercraft_target_dir: _build/presentation
   #course_rounds: all
   #rst2pdf: True
-  language: fi
+  #language: fi
 
 
 # header and footer can be text. But images work too.
@@ -50,7 +50,7 @@ files:
 header_footer:
   header: Example header
   header_visible: False
-  footer: Aalto-yliopisto 2019
+  footer: Aalto-yliopisto 2020
   footer_visible: True
 
 # impress.js fields can be applied.

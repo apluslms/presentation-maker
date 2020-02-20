@@ -405,7 +405,7 @@ def copy_file(source, target):
         pass
     else:
         if not source == target:
-            settings.logger.info("Copying {} to {}".format(source, target))
+            settings.logger.info("Copying {} to {}".format(source, Path.cwd() / target))
             if not target.parent.is_dir():
                 target.parent.mkdir(parents=True)
                 copyfile(str(source), str(target))
@@ -413,7 +413,7 @@ def copy_file(source, target):
                 copyfile(str(source), str(target))
 
 
-def parse_config_file(code_dir, config_name, build_dir, config_path_as_param):
+def parse_config_file(code_dir, config_path, build_dir):
     """
     Parse config file and return list of parameters.
 
@@ -421,26 +421,18 @@ def parse_config_file(code_dir, config_name, build_dir, config_path_as_param):
     """
 
     try:
-        if config_path_as_param:
-            if Path(config_path_as_param).parent == Path('.'):
-                # config_path_as_param is just a file and probably needs to find it from code_dir
-                config_file = (code_dir / config_path_as_param).resolve()
-            else:
-                # user given path to config
-                config_file = Path(config_path_as_param).resolve()
-        else:
-            # if no config given by parameters then use default configuration file
-            config_file = (code_dir / config_name).resolve()
-        if not config_file.exists():
+        config_file = config_path.name
+
+        if not config_path.exists():
             raise FileNotFoundError
     except FileNotFoundError as fnf:
-        settings.logger.error("trying to open config from: {}".format(str(config_file)))
-        settings.logger.error("Configuration file was not found. Make sure that path to the configuration file is "
-                              "correct.")
+        settings.logger.error("trying to open config from: {}".format(str(config_path)))
+        settings.logger.error("{} was not found. Make sure that path to the configuration file is "
+                              "correct.".format(config_file))
         settings.logger.error("error message: {}".format(fnf))
         exiting()
 
-    with open(str(config_file)) as file:
+    with open(str(config_path)) as file:
         doc = yaml.load(file, Loader=yaml.Loader)
         params_dict = []
         params = []
@@ -788,24 +780,25 @@ def create_presentation(args):
     Creates presentation (HTML, PDF) from POIs which are gathered from other RST files.
     Pdf will be created if you enable it from presentation_config.yaml.
 
-    presentation_config.yaml will be copied to _build directory where user can change settings.
+    presentation_config.yaml will be copied to the root of course directory where user can change settings.
 
     """
     code_dir = settings.code_dir
     build_dir = settings.build_dir
-
+    working_dir = Path.cwd()
     # background image related variables
     step_num = 0
+    # default name and path for configuration file
 
     if args[2].config_path:
         settings.logger.info("Using presentation configure file at {}".format(args[2].config_path))
-        config_path = args[2].config_path
+        config_path = Path(args[2].config_path)
     else:
-        # default name for configuration file
-        config_path = build_dir / settings.config_name
-        settings.logger.info("Using default configuration file: {}".format(config_path))
+        config_path = Path(settings.config_name)
+        settings.logger.info("Using default name and path for configuration file: {}".format(working_dir / config_path))
+
     params, raw_dict, dictionary, rst_file, ending, last_slide_content, transition, other_transitions = \
-        parse_config_file(code_dir, config_path, build_dir, args[2].config_path)
+        parse_config_file(code_dir, config_path, build_dir)
     raw_dict, params = set_parameters(raw_dict, args[2], params)
 
     if args[1]:
@@ -837,14 +830,14 @@ def initialization():
     settings.logger.info("Making initializations...")
     # creating _build if it is not created yet
     create_dir(settings.build_dir)
-    # config file will be copied to _build directory for easier access. Especially when using with roman.
-    copy_file(settings.code_dir / settings.config_name, settings.build_dir / settings.config_name)
+    # config file will be copied to the course root directory for easier access. Especially when using with roman.
+    copy_file(settings.code_dir / settings.config_name, Path(settings.config_name))
     settings.logger.info("Initializations OK.")
 
 
 def main():
-    initialization()
     header()
+    initialization()
     cmd_args = cmd_line_parsing()
     create_presentation(cmd_args)
 
