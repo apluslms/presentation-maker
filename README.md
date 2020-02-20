@@ -106,10 +106,25 @@ This text is no longer part of POI.
 ## Installing
 Open terminal and navigate somewhere where you would like to download Presentation Maker.
 
+### Virtual environment
+If you haven't installed Roman yet. It is best to install it in the virtual environment. If you have it already installed then you can skip this step.
+
+Create virtual environment, activate it. Update pip, setuptools and install Roman.
+```
+# in terminal
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -U pip 
+pip install -U setuptools
+pip install apluslms-roman
+```
+
+
 ### Edit course.yml
 - Navigate to the root of your course directory
 - Open course.yml file
-- find line which starts with `img:` and replace the value with the latest presentation-maker docker container (currently `apluslms/presentation-maker:0.0.1`). See [hub.docker.com - presentation-maker](https://hub.docker.com/r/apluslms/presentation-maker) for more info.
+- find line which starts with `img:` and replace the value with `apluslms/presentation-maker:latest` like in the example below. See [hub.docker.com - presentation-maker](https://hub.docker.com/r/apluslms/presentation-maker) for more info.
 - It is also recommended to add path to the configuration file. If it isn't there already. Default path to the configuration file is in the _build directory inside the course directory.
 
 ```
@@ -118,20 +133,29 @@ Open terminal and navigate somewhere where you would like to download Presentati
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:0.0.1
-    cmd: -y "_build/presentation_config.yaml"
+  - img: apluslms/presentation-maker:latest
+    cmd: -y "presentation_config.yaml"
     mnt: /compile
     
 ```
 
 ### Ready to make presentations
 
-When you run the presentation maker the first time it will create the `presentation_config.yaml` to the `_build` directory which is inside your course directory. Path may look like this: `a+course/_build/presentation_config.yaml`.
-Don't worry if you don't have the _build directory yet, it will also be created. After that first run you can start changing some settings in the configuration file.
+Presentation maker is ready to start creating presentations but before making one, it is recommended to make some changes to the configuration file. In the next step we will go through the configuration settings.
 
-Presentation maker is ready to start creating presentations but before making one, it is recommended to make changes to the configuration file. In the next step we will go through the configuration settings.
 
 # Presentation settings 
+
+Don't worry if you don't have the `presentation_config.yaml` yet, it will be created (root of course directory) when you run the Presentation Maker first time.
+Path to the configuration file will look something like this: `a+course/presentation_config.yaml`. After that first run you can start changing some settings in the configuration file.
+
+## Create presentation_config.yaml
+
+Go to the root of your course directory and run Roman to create `presentation_config.yaml`. You can ignore the output. It does not create any useful presentations yet.
+
+Now you will find configuration file in the root of your course directory.
+
+## Setting priorities
 
 Presentation maker takes settings from configuration file (`presentation_config.yaml`) and from course parameters (`course.yml`).
 If neither one is being used, presentations will be created with default settings.
@@ -145,10 +169,13 @@ This simply means that if you define title via configuration file and via parame
 
 ## Configuration file settings
 
-Best way to use Presentation Maker is to set all settings by configuration file and use parameters for temporary changes, like testing some feature.
+Best way to use Presentation Maker is to set most of the settings by configuration file and use parameters for smaller changes, like testing some feature, changing language or title.
 
 1. Set title, subtitle, author, description in the `presentation_config.yaml`
-2. Set header & footer settings in `presentation_config.yaml`
+
+    **Note: Title and subtitle will be used to generate the first slide.** 
+    
+2. Set header & footer settings in `presentation_config.yaml`.
     ```
     # It is possible to add images to headers and footers. 
     # header: .. image:: path/to/img/image.jpg
@@ -160,7 +187,7 @@ Best way to use Presentation Maker is to set all settings by configuration file 
       footer_visible: True
     
     ```
-3. Edit last slide content in the `presentation_config.yaml`
+3. Edit last slide content in the `presentation_config.yaml`. reStructuredText  formatting can be used inside the `content` to make the last slide.
 
     ```
     # content is RST formatted. You may want to change title from "Last slide" to something else
@@ -189,14 +216,14 @@ Best way to use Presentation Maker is to set all settings by configuration file 
    # in presentation_confing.yaml - just showing files
    
     files:
-      #filename: _build/presentation.rst
-      #css: css/presentation.css
-      #course_path: .
+      # filename: _build/presentation.rst
+      # css: css/presentation.css
+      # course_path: .
       make_pdf: True
-      #hovercraft_target_dir: _build/presentation
-      #course_rounds: all
+      # hovercraft_target_dir: _build/presentation
+      # course_rounds: all
       rst2pdf: False
-
+      # language: fi
     ```
 
 ## Course parameters
@@ -206,13 +233,13 @@ Go to the root of your course directory.
 Open `course.yml`.
 
 ```
-# course.yml looks something like this
+# course.yml might look something like this. We have set title, language, verbose and our custom config path.
 ---
 version: 2
 
 steps:
-  - img: apluslms/compile-presentation:latest
-    cmd: -t "Example title" -v -y "_build/presentation_config.yaml"
+  - img: apluslms/presentation-maker:latest
+    cmd: -t "Example title" -v -l en -y "path/to/your/custom/presentation_config.yaml"
     mnt: /compile
     
 ```
@@ -232,7 +259,7 @@ Let's change these:
 version: 2
 
 steps:
-  - img: apluslms/compile-presentation:latest
+  - img: apluslms/presentation-maker:latest
     cmd: -t "Example title" -s "Example subitle" -a "John Doe" -r 1
     mnt: /compile
     
@@ -246,7 +273,7 @@ Rounds can be selected by interval or individually.
 
 For example if I want to include rounds 1 to 5 and 8. 
 
-I would do it like this: `-r 1-5, 8`
+You can do it like this: `-r 1-5, 8`
 
 ```
 # course.yml - selecting rounds
@@ -316,7 +343,7 @@ authors and titles:
 
 # Making presentations
 
-After all these settings have been setup you can just run `roman` in the root of A+course directory and presentation will be created. 
+After all these settings have been setup you can just run `roman` in the root of A+course directory and presentation will be created. If you installed Roman in the virtual environment then make sure to activate it, [more here](#virtual-environment).  
 
 Presentation maker creates HTML presentations by default. But with parameters or configuration settings it can create pdf files too.
 
@@ -335,11 +362,50 @@ roman
 
 ```
 
+## Selecting language for the presentation
+
+Some courses may have multiple languages. If this is the case you can set wanted language with parameters or by configuration file.
+
+Note: Finnish is used by default and you do not need to select it specifically.
+ 
+### Parameters
+
+Use `-l` parameter to select the language. 
+
+```
+# course.yml - selecting "english" as a language with parameters
+---
+version: 2
+
+steps:
+  - img: apluslms/presentation-maker:latest
+    cmd: -l en
+    mnt: /compile
+    
+```
+
+### Configuration file
+
+```
+# in presentation_config.yaml. Setting language to 'en' and save file.
+
+files:
+  # filename: _build/presentation.rst
+  # css: css/presentation.css
+  # course_path: .
+  # make_pdf: True
+  # hovercraft_target_dir: _build/presentation
+  # course_rounds: all
+  # rst2pdf: False
+  language: en
+```
+
+
 ## PDF creation
 
 ### With parameters
 
-With `-p` parameter pdf creation can be switched to on. There are two main methods for creating PDF. You can read more about it [here](#Which-method-should-I-use)
+With `-p` parameter pdf creation can be switched to on. There are two main methods for creating PDF. You can read more about it [here](#which-method-i-should-use)
  
 **rst2pdf**
 
@@ -350,7 +416,7 @@ By default **rst2pdf** is selected as a main pdf creator. You can use it with ju
 version: 2
 
 steps:
-  - img: apluslms/compile-presentation:latest
+  - img: apluslms/presentation-maker:latest
     cmd: -p
     mnt: /compile
     
@@ -366,7 +432,7 @@ By using parameters `-p` and `-m`. PDF creation can be toggled on and creation m
 version: 2
 
 steps:
-  - img: apluslms/compile-presentation:latest
+  - img: apluslms/presentation-maker:latest
     cmd: -p -m
     mnt: /compile
     
@@ -387,14 +453,14 @@ After the editing, configuration file looks like this below.
 # Just a part of configuration file
 
 files:
-  #filename: _build/presentation.rst
-  #css: css/presentation.css
-  #course_path: .
+  # filename: _build/presentation.rst
+  # css: css/presentation.css
+  # course_path: .
   make_pdf: True
-  #hovercraft_target_dir: _build/presentation
-  #course_rounds: all
+  # hovercraft_target_dir: _build/presentation
+  # course_rounds: all
   rst2pdf: False
-
+  # language: fi
 ```
 
 No matter which way you made the settings, you should be able to create pdf file along with html presentation by just typing `roman` in the terminal (as long as you are in the root of A+course directory). 
@@ -436,7 +502,7 @@ roman
 version: 2
 
 steps:
-  - img: apluslms/compile-presentation:latest
+  - img: apluslms/presentation-maker:latest
     cmd: -p -m
     mnt: /compile
     
@@ -693,7 +759,7 @@ In this case you may need to edit `course.yml` file and add path to the configur
     version: 2
     
     steps:
-      - img: apluslms/presentation-maker:0.0.1
+      - img: apluslms/presentation-maker:latest
         cmd: -y "_build/presentation_config.yaml"
         mnt: /compile
 
