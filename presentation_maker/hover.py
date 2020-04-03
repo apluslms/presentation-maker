@@ -10,8 +10,12 @@ from pathlib import Path
 from bs4 import BeautifulSoup as bs
 
 from . import presentation_maker as pm
-from . import create_columns as column
 from . import settings
+
+from docutils import nodes
+from docutils.parsers.rst import Directive, directives
+
+import hovercraft
 
 
 def create_unique_folder(current_path):
@@ -170,15 +174,6 @@ def change_paths(rst_file):
         writer.writelines(file)
 
 
-def make_columns(filename):
-    """
-    Creates columns if ::newcol option is used inside of point-of-interest in RST material.
-    :param filename:
-    :return:
-    """
-    column.create(filename)
-
-
 def add_bgimg_to_steps(soup):
     steps = soup.find_all(attrs={'class': 'step', 'bgimg': True})
 
@@ -259,40 +254,105 @@ def links_to_new_tabs(soup, html_file):
         write_to_file(soup, html_file)
 
 
+# hovercraft directives. Same directives as in a-plus-rst-tools but done with docutils. In order to make column and
+# row directives to work in hovercraft
+
+class Column(Directive):
+    option_spec = {settings.column_width: directives.positive_int,
+                   settings.column_class: directives.unchanged,
+                   }
+
+    final_argument_whitespace = True
+    has_content = True
+
+    def run(self):
+        if settings.column_width in self.options:
+            col_width = str(self.options[settings.column_width])
+        else:
+            col_width = str(12)
+        if settings.column_class in self.options:
+            classes = str(self.options[settings.column_class])
+        else:
+            classes = ""
+        column_content = '\n'.join(self.content)
+        node = nodes.container(column_content)
+        node['classes'] = 'col-sm-' + col_width + ' ' + classes
+
+        self.state.nested_parse(self.content, self.content_offset, node)
+        return [node]
+
+
+class Row(Directive):
+    required_arguments = 0
+
+    has_content = True
+
+    def run(self):
+        self.assert_has_content()
+
+        row_container = nodes.container()
+        row_container['classes'].append('row')
+
+        self.state.nested_parse(self.content, self.content_offset, row_container)
+
+        return [row_container]
+
+
+def add_bootstrap(soup, filename):
+    """
+    Adds bootstrap to the hovercraft.
+    :param filename:
+    :param soup:
+    :return:
+    """
+
+    settings.logger.info("Adding bootstrap styles to hovercraft.")
+    try:
+        new_link = soup.new_tag("link")
+        new_link.attrs["crossorigin"] = "anonymous"
+        new_link.attrs["integrity"] = "sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        new_link.attrs["href"] = "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        new_link.attrs["rel"] = "stylesheet"
+        soup.head.link.insert_after(new_link)
+    except AttributeError as no_head:
+        settings.logger.error("Error - Bootstrap link creation failed. Could not find head tag in {}".format(filename))
+
+    write_to_file(soup, filename)
+    settings.logger.info("Bootstrap added successfully.")
+
+
 def run(filename, dictionary, build_dir):
     """
     Runs hovercraft command. Creates presentation in presentation folder.
     """
 
     try:
+        settings.logger.info("registering directives...")
+        directives.register_directive('row', Row)
+        directives.register_directive('column', Column)
+        settings.logger.info("Done")
+
         pm.print_spacer()
         settings.logger.info("Running hovercraft to create presentation...\n")
-        # with os.system command it is hard to catch errors
         hovercraft_target_dir = get_folder_name(dictionary)
         hovercraft_target_dir = str(Path(build_dir) / hovercraft_target_dir)
 
-        command = ["hovercraft", filename, hovercraft_target_dir]
+        command = ["--skip-help", filename, hovercraft_target_dir]
 
-        # if Path(filename).exists():
         handle_images(hovercraft_target_dir, filename)
-        subprocess.run(command, check=True)
+        hovercraft.main(command)
         html_file = Path(hovercraft_target_dir) / "index.html"
-        if settings.columns:
-            make_columns(str(html_file))
+        soup = make_soup(html_file)
+        add_bootstrap(soup, html_file)
         if settings.bg_img:
-            soup = make_soup(html_file)
             add_background_images(soup, html_file)
         if not settings.header_visible:
-            soup = make_soup(html_file)
             hide_header(soup, html_file)
         if not settings.footer_visible:
-            soup = make_soup(html_file)
             hide_footer(soup, html_file)
         links_to_new_tabs(soup, html_file)
         settings.logger.info("Hovercraft presentation created.")
         return hovercraft_target_dir
-        # else:
-        #     raise FileNotFoundError("{} does not exist.".format(filename))
     except FileNotFoundError as fnf_error:
         settings.logger.critical("\nCritical error occurred while running hovercraft."
                                  "\nFile not found.\nError message: {}".format(fnf_error))

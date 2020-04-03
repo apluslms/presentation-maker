@@ -12,5 +12,4 @@ initialize_presentation.py*
 .DS_Store
 *~
 *.sw[op]
-images
 *.egg-info

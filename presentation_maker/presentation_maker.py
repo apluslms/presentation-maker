@@ -15,10 +15,10 @@ from pathlib import Path
 
 import yaml
 
-from . import pathfinder
-from . import create_pdf
-from . import hover
-from . import settings
+from presentation_maker import pathfinder
+from presentation_maker import create_pdf
+from presentation_maker import hover
+from presentation_maker import settings
 
 
 def write_ending(file_to_write, ending, last_slide_content):
@@ -149,9 +149,6 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # directives which are handled differently while writing
     directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::']
 
-    # columns in slides.
-    newcol = settings.newcol
-
     # exceptions handled for these files in write_rst function
 
     with open(file_to_read, 'r') as reader, open(file_to_write, 'a') as writer:
@@ -193,17 +190,18 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             # to provide header to the slide
                             title_option = True
                             title = get_title_from_options(line)
-                        if ":columns:" in line:
-                            settings.column_ratios.append(line.split(":columns:")[1].lstrip().rstrip())
-                        if newcol in line:
-                            settings.columns = True
-                            # keep ::newcol in rst. Later it is easier to know how columns are set
-                            writer.write("\n::newcol\n")
                         if ":bgimg:" in line:
                             # if poi has background image in it. We need to keep it in rst. It will be used later.
                             image = line.split(":bgimg:")[1].lstrip().rstrip()
                             writer.write("\n:bgimg: {}".format(image))
                             settings.bg_img = True
+                        if ":math" in line:
+                            writer.write(line)
+                        if settings.column_width_opt in line:
+                            # keep column :width: option in rst.
+                            writer.write(line)
+                        if settings.column_class_opt in line:
+                            writer.write(line)
 
                 elif re.search("^([a-zA-Z0-9\S]+)", line):
                     # if the line starts with numbers or characters
@@ -232,11 +230,16 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                         # gets the spaces in case if user has not set any options in poi
                     if directive[0] in line:
                         newline = find_image_path(image_paths, line.split(directive[0])[1])
-                        writer.write(directive[0] + " " + str(newline) + "\n")
+                        parts = line.split(directive[0])
+                        new = parts[0] + directive[0] + " " + str(newline)
+                        writer.write(new + "\n")
                     elif directive[1] in line:
                         # strips .. figure from the line so path remains
                         newline = find_image_path(image_paths, line.split(directive[1])[1])
-                        writer.write(directive[1] + " " + str(newline) + "\n")
+                        parts = line.split(directive[1])
+                        new = parts[0] + directive[0] + " " + str(newline)
+                        writer.write(new + "\n")
+                        # writer.write(directive[1] + " " + str(newline) + "\n")
                     elif directive[2] in line:
                         # Handling youtube video
                         # line looks like this: .. youtube:: Yw6u6YkTgQ4

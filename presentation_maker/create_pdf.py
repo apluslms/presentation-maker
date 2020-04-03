@@ -106,8 +106,6 @@ def convert_rst_to_rst2pdf_compatible(build_path, rst_file):
                 else:
                     note = True
                 # remove notes from pdf. Could also be saved to another file if wanted.
-            elif re.search(settings.newcol, line):
-                pass
             else:
                 # store this line since it's ok
                 if note:

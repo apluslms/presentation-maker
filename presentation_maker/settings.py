@@ -2,7 +2,7 @@
 All initializations and settings. You do not need to change any of these values, unless you are making some changes to the . These are just presets and will be
 changed while running the code.
 """
-from . import custom_formatter as cf
+from presentation_maker import custom_formatter as cf
 from pathlib import Path
 
 import logging
@@ -14,7 +14,6 @@ build_dir = Path(Path.cwd() / "_build")
 
 not_in_slides = ":not_in_slides"
 poi = 'point-of-interest::'
-newcol = "::newcol"
 note = ".. note::"
 
 # language settings
@@ -26,7 +25,6 @@ language = "language"
 verbose = False
 
 # like global variables. Flags for columns and background images.
-columns = False
 bg_img = False
 
 # has column width ratios for each slide that has columns and is included in slides. ["5 1 2", "3 1", ...]
@@ -108,4 +106,9 @@ slide_class = "class"
 last_slide = "last_slide"
 content = "content"
 
+# column options
+column_class = "column-class"
+column_class_opt = ":{}:".format(column_class)
+column_width = "width"
+column_width_opt = ":{}:".format(column_width)
 
