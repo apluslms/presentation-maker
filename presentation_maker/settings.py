@@ -14,7 +14,6 @@ build_dir = Path(Path.cwd() / "_build")
 
 not_in_slides = ":not_in_slides"
 poi = 'point-of-interest::'
-newcol = "::newcol"
 note = ".. note::"
 
 # language settings
@@ -26,7 +25,6 @@ language = "language"
 verbose = False
 
 # like global variables. Flags for columns and background images.
-columns = False
 bg_img = False
 
 # has column width ratios for each slide that has columns and is included in slides. ["5 1 2", "3 1", ...]

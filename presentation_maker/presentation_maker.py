@@ -149,9 +149,6 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # directives which are handled differently while writing
     directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::']
 
-    # columns in slides.
-    newcol = settings.newcol
-
     # exceptions handled for these files in write_rst function
 
     with open(file_to_read, 'r') as reader, open(file_to_write, 'a') as writer:
@@ -193,17 +190,16 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             # to provide header to the slide
                             title_option = True
                             title = get_title_from_options(line)
-                        if ":columns:" in line:
-                            settings.column_ratios.append(line.split(":columns:")[1].lstrip().rstrip())
-                        if newcol in line:
-                            settings.columns = True
-                            # keep ::newcol in rst. Later it is easier to know how columns are set
-                            writer.write("\n::newcol\n")
                         if ":bgimg:" in line:
                             # if poi has background image in it. We need to keep it in rst. It will be used later.
                             image = line.split(":bgimg:")[1].lstrip().rstrip()
                             writer.write("\n:bgimg: {}".format(image))
                             settings.bg_img = True
+                        if ":width:" in line:
+                            # keep column :width: option in rst.
+                            writer.write(line)
+                        if ":column_class:" in line:
+                            writer.write(line)
 
                 elif re.search("^([a-zA-Z0-9\S]+)", line):
                     # if the line starts with numbers or characters

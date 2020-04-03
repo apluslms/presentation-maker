@@ -6,6 +6,11 @@
   color: red;
 }
 
+/** Sometimes help window does not close, so this will close it permanently. **/
+#hovercraft-help {
+  display: none;
+}
+
 .center-it {
 	margin: 0 !important;
   position: absolute !important;
@@ -128,45 +133,14 @@ a {
   width: 30%;
 }
 
-/* COLUMN SYSTEM - WIP */
-/*
-
-<div class="row">
-    <div class="column">
-        <p>Some text here in column 1</p>
-    </div>
-    <div class="column">
-        <p>Lorem ipsum dolor sit amet, nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    </div>
-</div>
-
-*/
-
 .step {
     /* makes slides larger. Should work with any resolution. If slides seem too big adjust these settings.*/
     width: calc(100vw - 100px);
     padding: calc(100vh / 4) 0px;
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 100%;
-  flex: auto;
-}
-
-.column img {
-  align-self: center;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  width: 100%;
-}
-
 /* TABLE STYLES */
+
 table {
   border-collapse: collapse;
   width: 100%;
