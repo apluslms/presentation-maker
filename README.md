@@ -27,7 +27,7 @@
   * [Remove surrounding box from POI](#remove-surrounding-box-from-poi)
   * [Hide slides](#hide-slides)
   * [Background images](#background-images)
-  * [Columns](#columns)
+  * [Columns and rows](#columns-and-rows)
   * [Videos in slides](#videos-in-slides)
     + [Youtube](#youtube)
         * [Example](#example)
@@ -579,31 +579,52 @@ Background images can be added with `:bgimg:` option in POI. Option takes path a
 
 ```
 
-## Columns
+## Columns and rows
 
-Multiple columns can be added to the slides and the column widths can be adjusted individually.
+Multiple columns and rows can be added to the slides. Rows and columns can be nested like in the example below to create any kind of structures.
 
-Column widths are adjusted with `:columns:` option in POI. Each value represents relative width of each column. First column is biggest in width since it has a width of 4/7 of the available space.
+Column widths can be adjusted individually and each column can have different classes for styling. Different Bootstrap classes can be added to each column to create unique content.
 
-Columns can be created with `::newcol` like in the example below.
+Sum of the column widths on each row should be 12, otherwise layout may break. See the example.
 
 ```
-# Column example
+# See how background color is selected by using Bootstrap classes in the column_class option.
+# This example has two rows, see how the last column creates column which has a height of two rows.
 
-.. point-of-interest:: Columns
-  :columns: 4 2 1
-    
-  Column 1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mollis eros in faucibus ultricies. Nunc maximus justo justo, vitae tincidunt nisi dictum sed. Sed varius velit lacus, a cursus ipsum hendrerit tempor.
+.. point-of-interest:: test
 
-  ::newcol
+   .. row::
 
-  Column 2 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     .. column::
+       :width: 8
+       :column_class: bg-warning
+       
+       .col-8
 
-  ::newcol
+       .. row::
 
-  Column 3 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+         .. column::
+           :width: 6
+           :column_class: bg-light
+
+           .col-6
+
+         .. column::
+           :width: 6
+           :column_class: bg-secondary
+
+           .col-6
+
+     .. column::
+       :width: 4
+       :column_class: bg-success
+
+       .col-4
 
 ```  
+Result 
+
+![column_row_example](images/column_row.png)
 
 ## Videos in slides
 
