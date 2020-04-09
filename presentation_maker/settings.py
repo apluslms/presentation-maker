@@ -2,7 +2,7 @@
 All initializations and settings. You do not need to change any of these values, unless you are making some changes to the . These are just presets and will be
 changed while running the code.
 """
-from . import custom_formatter as cf
+from presentation_maker import custom_formatter as cf
 from pathlib import Path
 
 import logging
@@ -106,4 +106,9 @@ slide_class = "class"
 last_slide = "last_slide"
 content = "content"
 
+# column options
+column_class = "column-class"
+column_class_opt = ":{}:".format(column_class)
+column_width = "width"
+column_width_opt = ":{}:".format(column_width)
 

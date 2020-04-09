@@ -257,40 +257,27 @@ def links_to_new_tabs(soup, html_file):
 # hovercraft directives. Same directives as in a-plus-rst-tools but done with docutils. In order to make column and
 # row directives to work in hovercraft
 
-class ColumnNode(nodes.General, nodes.Element):
-
-    def __init__(self, text):
-        super(ColumnNode, self).__init__()
-
-    @staticmethod
-    def visit_column(self, node):
-        self.body.append(self.starttag(node, 'div'))
-
-    @staticmethod
-    def depart_column(self, node=None):
-        self.body.append('</div>\n')
-
-
 class Column(Directive):
-    option_spec = {'width': directives.positive_int,
-                   'column_class': directives.unchanged,
+    option_spec = {settings.column_width: directives.positive_int,
+                   settings.column_class: directives.unchanged,
                    }
 
     final_argument_whitespace = True
     has_content = True
 
     def run(self):
-        self.assert_has_content()
-        if 'width' in self.options:
-            col_width = str(self.options['width'])
-        if 'column_class' in self.options:
-            classes = str(self.options['column_class'])
+        if settings.column_width in self.options:
+            col_width = str(self.options[settings.column_width])
+        else:
+            col_width = str(12)
+        if settings.column_class in self.options:
+            classes = str(self.options[settings.column_class])
         else:
             classes = ""
-
         column_content = '\n'.join(self.content)
         node = nodes.container(column_content)
         node['classes'] = 'col-sm-' + col_width + ' ' + classes
+
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
 
@@ -342,13 +329,11 @@ def run(filename, dictionary, build_dir):
     try:
         settings.logger.info("registering directives...")
         directives.register_directive('row', Row)
-        directives.register_directive('column_node', ColumnNode)
         directives.register_directive('column', Column)
         settings.logger.info("Done")
 
         pm.print_spacer()
         settings.logger.info("Running hovercraft to create presentation...\n")
-        # with os.system command it is hard to catch errors
         hovercraft_target_dir = get_folder_name(dictionary)
         hovercraft_target_dir = str(Path(build_dir) / hovercraft_target_dir)
 
