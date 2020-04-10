@@ -1,15 +1,18 @@
 # Presentation maker
 
-## Contents
+## Table of contents
 
 - [Introduction](#introduction)
   * [Which method I should use](#which-method-i-should-use)
 - [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installing](#installing)
+    + [Virtual environment](#virtual-environment)
     + [Edit course.yml](#edit-courseyml)
     + [Ready to make presentations](#ready-to-make-presentations)
 - [Presentation settings](#presentation-settings)
+  * [Create presentation_config.yaml](#create-presentation-configyaml)
+  * [Setting priorities](#setting-priorities)
   * [Configuration file settings](#configuration-file-settings)
   * [Course parameters](#course-parameters)
     + [Changing title, subtitle, author and other things](#changing-title--subtitle--author-and-other-things)
@@ -17,15 +20,19 @@
     + [All parameters](#all-parameters)
 - [Making presentations](#making-presentations)
   * [HTML presentation](#html-presentation)
+  * [Selecting language for the presentation](#selecting-language-for-the-presentation)
+    + [Parameters](#parameters)
+    + [Configuration file](#configuration-file)
   * [PDF creation](#pdf-creation)
     + [With parameters](#with-parameters)
     + [With configuration file](#with-configuration-file)
 - [Workflow](#workflow)
     + [HTML presentation](#html-presentation-1)
     + [PDF and HTML presentations](#pdf-and-html-presentations)
-- [Special features](#special-features)
+- [Features](#features)
   * [Remove surrounding box from POI](#remove-surrounding-box-from-poi)
   * [Hide slides](#hide-slides)
+  * [Math in the titles](#math-in-the-titles)
   * [Background images](#background-images)
   * [Columns and rows](#columns-and-rows)
   * [Videos in slides](#videos-in-slides)
@@ -45,6 +52,7 @@
   * [presentation_config.yaml not found](#presentation-configyaml-not-found)
 - [Built With](#built-with)
 - [Authors](#authors)
+
 
 # Introduction
 
@@ -522,7 +530,7 @@ presentation_maker.py -d custom_presentation.rst
 
 ```
 
-# Special features
+# Features
 
 ## Remove surrounding box from POI
 
@@ -566,6 +574,8 @@ These options can be used at the same time or separately.
   In orci neque, porta sit amet ultricies facilisis, pharetra nec diam. Sed eu risus a ex tincidunt accumsan.
 
 ```
+## Math in the titles
+Math can be used in the titles with the `:math:` role. Do not use math directive (`.. math::`), since it is not supported in the title. 
 
 ## Background images
 Background images can be added with `:bgimg:` option in POI. Option takes path argument.
@@ -581,9 +591,11 @@ Background images can be added with `:bgimg:` option in POI. Option takes path a
 
 ## Columns and rows
 
-Multiple columns and rows can be added to the slides. Rows and columns can be nested like in the example below to create any kind of structures.
+Multiple columns and rows can be added to the slides. Rows and columns can be nested like in the example below to create any kind of structures. Just be careful with the indentation.
 
-Column widths can be adjusted individually and each column can have different classes for styling. Different Bootstrap classes can be added to each column to create unique content.
+Column widths can be adjusted individually and each column can have different classes for styling. Different Bootstrap classes can be added to each column to create unique content. 
+
+For different background and text colors see [Bootstrap documentation](https://getbootstrap.com/docs/4.2/utilities/colors/) for reference.
 
 Sum of the column widths on each row should be 12, otherwise layout may break. See the example.
 
