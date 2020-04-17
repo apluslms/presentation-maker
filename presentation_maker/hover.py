@@ -258,7 +258,7 @@ def links_to_new_tabs(soup, html_file):
 # row directives to work in hovercraft
 
 class Column(Directive):
-    option_spec = {settings.column_width: directives.positive_int,
+    option_spec = {settings.column_width: directives.unchanged,
                    settings.column_class: directives.unchanged,
                    }
 
@@ -267,16 +267,25 @@ class Column(Directive):
 
     def run(self):
         if settings.column_width in self.options:
-            col_width = str(self.options[settings.column_width])
-        else:
-            col_width = str(12)
+            col_width = str(self.options[settings.column_width]).strip()
+            if not col_width:
+                # width is empty.
+                col_width = ""
+            else:
+                # not empty
+                col_width = "-" + col_width
+
         if settings.column_class in self.options:
             classes = str(self.options[settings.column_class])
+            if not classes:
+                classes = ""
+            else:
+                classes = " " + classes
         else:
             classes = ""
         column_content = '\n'.join(self.content)
         node = nodes.container(column_content)
-        node['classes'] = 'col-sm-' + col_width + ' ' + classes
+        node['classes'] = 'col-sm' + col_width + ' ' + classes
 
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
