@@ -5,6 +5,7 @@ RST file. Presentation (index.html) will be in the folder called presentation.
 """
 
 import subprocess
+import traceback
 from pathlib import Path
 
 from bs4 import BeautifulSoup as bs
@@ -69,23 +70,26 @@ def get_folder_name(dictionary):
         return presentation_folder
 
 
-def handle_images(pres_dir_path, rst_file):
+def handle_images(pres_dir_path, rst_file, image_paths):
     """
     Handles all the functions which are needed to copy images (used in presentation) to images directory.
     And also changes image paths in presentation.rst to match new paths.
 
+    :param image_paths:
     :param pres_dir_path:
     :param rst_file:
     :return:
     """
+
     pres_dir_path = Path(pres_dir_path)
     images_dir_path = pres_dir_path.parent / "images"
     if not images_dir_path.exists():
         settings.logger.info("Images folder does not exist. Creating {}".format(images_dir_path))
         images_dir_path.mkdir(exist_ok=False)
-    image_list = find_images(rst_file)
+    # image_list = find_images(rst_file)
+    image_list = image_paths
     copy(image_list, images_dir_path)
-    change_paths(rst_file)
+    # change_paths(rst_file)
 
 
 def copy(image_list, images_dir_path):
@@ -99,79 +103,14 @@ def copy(image_list, images_dir_path):
     settings.logger.info("Starting to copy images...")
     new_paths = []
     for image in image_list:
-        image = Path(image).resolve()
-        source = image
-        destination = images_dir_path / image.name
-        new_paths.append(destination)
-        pm.copy_file(source, destination)
+        if image:
+            image = Path(image).resolve()
+            source = image
+            destination = images_dir_path / image.name
+            new_paths.append(destination)
+            pm.copy_file(source, destination)
     settings.logger.info("Images copied to {}".format(images_dir_path))
     return new_paths
-
-
-def find_images(rst_file):
-    """
-    Finds images from hovercraft compatible RST file and creates image path list and returns it.
-
-    :param rst_file:
-    :return:
-    """
-    img_list = []
-    with open(rst_file, 'r') as reader:
-        for line in reader.readlines():
-            if ".. image::" in line:
-                path = line.split(".. image::")[1].strip()
-                img_list.append(path)
-            elif ".. figure::" in line:
-                path = line.split(".. figure::")[1].strip()
-                img_list.append(path)
-            elif ":bgimg:" in line:
-                path = line.split(":bgimg:")[1].strip()
-                img_list.append(path)
-    return img_list
-
-
-def change_paths(rst_file):
-    """
-    Changes all image paths in RST file to point in the images directory. All images are in images directory. Paths
-    will be edited to match following pattern: "../images/image.jpg". All changes will be written to rst file.
-
-    These new paths needs to be in relation to the index.html. So "../images/image.png" is correct way to do this.
-    :param rst_file:
-    """
-    with open(rst_file, 'r') as file:
-        # read a list of lines into data
-        file = file.readlines()
-    index = 0
-    for line in file:
-        if ".. image::" in line:
-            parts = line.split(".. image::")
-            old_path = Path(line.split(".. image::")[1].strip())
-            relative = str(Path('..') / old_path.parent.name / old_path.name)
-            # write ".. image::" back
-            # parts[0] for indentation
-            new = "{}{}{}\n".format(parts[0], ".. image:: ", relative)
-            file[index] = str(new)
-        elif ".. figure::" in line:
-            parts = line.split(".. figure::")
-            old_path = Path(line.split(".. figure::")[1].strip())
-            relative = str(Path('..') / old_path.parent.name / old_path.name)
-            # write ".. figure::" back
-            # parts[0] for indentation
-            new = "{}{}{}\n".format(parts[0], ".. figure:: ", relative)
-            file[index] = str(new)
-        elif ":bgimg:" in line:
-            parts = line.split(":bgimg:")
-            old_path = Path(line.split(":bgimg:")[1].strip())
-            relative = str(Path('..') / old_path.parent.name / old_path.name)
-            # no need to write it back ".. figure::" back
-            # parts[0] for indentation
-            new = "{}{}{}\n".format(parts[0], ":bgimg: ", relative)
-            file[index] = str(new)
-        index += 1
-
-    # write changed paths to presentation.rst file.
-    with open(rst_file, 'w') as writer:
-        writer.writelines(file)
 
 
 def add_bgimg_to_steps(soup):
@@ -274,6 +213,8 @@ class Column(Directive):
             else:
                 # not empty
                 col_width = "-" + col_width
+        else:
+            col_width = ""
 
         if settings.column_class in self.options:
             classes = str(self.options[settings.column_class])
@@ -315,7 +256,6 @@ def add_bootstrap(soup, filename):
     :return:
     """
 
-    settings.logger.info("Adding bootstrap styles to hovercraft.")
     try:
         new_link = soup.new_tag("link")
         new_link.attrs["crossorigin"] = "anonymous"
@@ -327,10 +267,9 @@ def add_bootstrap(soup, filename):
         settings.logger.error("Error - Bootstrap link creation failed. Could not find head tag in {}".format(filename))
 
     write_to_file(soup, filename)
-    settings.logger.info("Bootstrap added successfully.")
 
 
-def run(filename, dictionary, build_dir):
+def run(filename, dictionary, build_dir, image_paths):
     """
     Runs hovercraft command. Creates presentation in presentation folder.
     """
@@ -348,7 +287,7 @@ def run(filename, dictionary, build_dir):
 
         command = ["--skip-help", filename, hovercraft_target_dir]
 
-        handle_images(hovercraft_target_dir, filename)
+        handle_images(hovercraft_target_dir, filename, image_paths)
         hovercraft.main(command)
         html_file = Path(hovercraft_target_dir) / "index.html"
         soup = make_soup(html_file)
@@ -365,15 +304,21 @@ def run(filename, dictionary, build_dir):
     except FileNotFoundError as fnf_error:
         settings.logger.critical("\nCritical error occurred while running hovercraft."
                                  "\nFile not found.\nError message: {}".format(fnf_error))
+        tb = traceback.format_exc()
+        settings.logger.warning(tb)
         pm.exiting()
 
     except OSError as error:
         settings.logger.critical("\nError occurred while running hovercraft.\nError message: {}".format(error))
+        tb = traceback.format_exc()
+        settings.logger.warning(tb)
         pm.exiting()
     except subprocess.CalledProcessError as e:
         settings.logger.critical("\nError occurred while running hovercraft.\nError: {}, \noutput: {} "
                                  "\nPossible cause: Header and/or footer images do not exist or image paths are not "
                                  "correct in presentation_config.yaml".format(e, e.output))
+        tb = traceback.format_exc()
+        settings.logger.warning(tb)
         pm.exiting()
     finally:
         pm.print_spacer()

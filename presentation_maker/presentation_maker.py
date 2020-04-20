@@ -123,8 +123,14 @@ def depth_of_indentation(line, spaces):
         return spaces
 
 
+def change_path_to_relative(absolute_path):
+    if absolute_path:
+        relative = str(Path('..') / absolute_path.parent.name / absolute_path.name)
+        return relative
+
+
 def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths, other_transitions,
-              raw_dict, step_num):
+              raw_dict, step_num, img_list):
     """
     This is just for extracting point-of-interest from rst-files.
     It will get images too if there are any inside the POI.
@@ -147,8 +153,9 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # if 'not_in_slides' flag is changed in that file, it should be changed here as well.
     not_in_slides = settings.not_in_slides
     # directives which are handled differently while writing
-    directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::']
-
+    directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::', '.. column::', '.. row::', '.. code-block::']
+    # If in code block inside POI register it, if code block not in POI ignore
+    code_block = False
     # exceptions handled for these files in write_rst function
 
     with open(file_to_read, 'r') as reader, open(file_to_write, 'a') as writer:
@@ -191,10 +198,16 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             title_option = True
                             title = get_title_from_options(line)
                         if ":bgimg:" in line:
-                            # if poi has background image in it. We need to keep it in rst. It will be used later.
-                            image = line.split(":bgimg:")[1].lstrip().rstrip()
-                            writer.write("\n:bgimg: {}".format(image))
-                            settings.bg_img = True
+                            if not code_block:
+                                # if poi has background image in it. We need to keep it in rst. It will be used later.
+                                new_path = find_image_path(image_paths, line.split(":bgimg:")[1])
+                                new_path = change_path_to_relative(new_path)
+                                if new_path:
+                                    writer.write("\n:bgimg: {}".format(new_path))
+                                    settings.bg_img = True
+                                    # img_path = line.split(":bgimg:")[1].strip()
+                                    # img_list.append(img_path)
+                                    img_list.append(new_path)
                         if ":math" in line:
                             writer.write(line)
                         if settings.column_width_opt in line:
@@ -210,6 +223,7 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                     # means: poi has ended
                     start = False
                     title_written = False
+                    code_block = False
                     # ends slide
                     # if option :not_in_slides: is activated then do not write
                     # transition. Otherwise it will print double transition and
@@ -229,17 +243,22 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                         # those will be written to the file
                         # gets the spaces in case if user has not set any options in poi
                     if directive[0] in line:
-                        newline = find_image_path(image_paths, line.split(directive[0])[1])
-                        parts = line.split(directive[0])
-                        new = parts[0] + directive[0] + " " + str(newline)
-                        writer.write(new + "\n")
+                        new_path = find_image_path(image_paths, line.split(directive[0])[1])
+                        if new_path:
+                            new_path = change_path_to_relative(new_path)
+                            parts = line.split(directive[0])
+                            new = parts[0] + directive[0] + " " + str(new_path)
+                            writer.write(new + "\n")
+                            img_list.append(new_path)
                     elif directive[1] in line:
                         # strips .. figure from the line so path remains
-                        newline = find_image_path(image_paths, line.split(directive[1])[1])
-                        parts = line.split(directive[1])
-                        new = parts[0] + directive[0] + " " + str(newline)
-                        writer.write(new + "\n")
-                        # writer.write(directive[1] + " " + str(newline) + "\n")
+                        new_path = find_image_path(image_paths, line.split(directive[1])[1])
+                        if new_path:
+                            new_path = change_path_to_relative(new_path)
+                            parts = line.split(directive[1])
+                            new = parts[0] + directive[0] + " " + str(new_path)
+                            writer.write(new + "\n")
+                            img_list.append(new_path)
                     elif directive[2] in line:
                         # Handling youtube video
                         # line looks like this: .. youtube:: Yw6u6YkTgQ4
@@ -251,6 +270,12 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                         video_name = line.split(directive[3])[1].rstrip().lstrip()
                         writer.write(".. raw:: html\n\n")
                         writer.write('  <video width="65%" controls><source src="../../_static/videot/' + video_name + '.mp4" type="video/mp4">Your browser does not support the video element.</video>')
+                    elif directive[4] or directive[5] in line:
+                        # row and column
+                        writer.write(line)
+                    elif directive[6] in line:
+                        # row and column
+                        code_block = True
                     else:
                         # empty lines need to be written
                         # otherwise some important empty lines will be deleted
@@ -258,26 +283,30 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             writer.write(line)
                         else:
                             writer.write(line[spaces:])
+
             if extract in line:
-                # if POI then start extract
-                # keeping count of the slides (steps)
-                step_num += 1
-                start = True
-                in_slides = True
 
-                if not title_option:
-                    # if there is title option this variable will be overwritten by that option value
-                    title = get_title_without_options(line)
-                else:
-                    settings.logger.warning("POI titled: {} has two titles. Please remove other one."
-                                            .format(title[0].rstrip()))
+                if not code_block:
+                    # if not in code block do things normally
+                    # if POI then start extract
+                    # keeping count of the slides (steps)
+                    step_num += 1
+                    start = True
+                    in_slides = True
 
-                settings.logger.info("\nextracting '{}' from {}".format(title[0].rstrip().lstrip(), file_to_read))
+                    if not title_option:
+                        # if there is title option this variable will be overwritten by that option value
+                        title = get_title_without_options(line)
+                    else:
+                        settings.logger.warning("POI titled: {} has two titles. Please remove other one."
+                                                .format(title[0].rstrip()))
+
+                    settings.logger.info("\nextracting '{}' from {}".format(title[0].rstrip().lstrip(), file_to_read))
 
         if start:
             # if file has ended unexpectedly, write transition
             transition_line(writer)
-    return first_slide
+    return first_slide, img_list
 
 
 def find_image_path(image_paths, line):
@@ -324,10 +353,10 @@ def find_image_path(image_paths, line):
                 pass
 
         print_spacer()
-        settings.logger.error("Image {} was not found. \nMake sure it exist and it is named the same way as the "
-                              "rst-file.".format(str(image_path).rstrip()))
+        settings.logger.warning('Image "{}" was not found. \nMake sure it exist and it is named the same way as the '
+                              'rst-file.'.format(str(image_path).rstrip()))
         print_spacer()
-        exiting()
+        # exiting()
 
 
 def create_img_path_list(course_path):
@@ -403,17 +432,20 @@ def copy_file(source, target):
     :return:
     """
 
-    if target.exists() and source.lstat().st_mtime <= target.lstat().st_mtime:
-        # if file has not changed then skip.
-        pass
+    if source.exists():
+        if target.exists() and source.lstat().st_mtime <= target.lstat().st_mtime:
+            # if file has not changed then skip.
+            pass
+        else:
+                if not source == target:
+                    settings.logger.info("Copying {} to {}".format(source, Path.cwd() / target))
+                    if not target.parent.is_dir():
+                        target.parent.mkdir(parents=True)
+                        copyfile(str(source), str(target))
+                    else:
+                        copyfile(str(source), str(target))
     else:
-        if not source == target:
-            settings.logger.info("Copying {} to {}".format(source, Path.cwd() / target))
-            if not target.parent.is_dir():
-                target.parent.mkdir(parents=True)
-                copyfile(str(source), str(target))
-            else:
-                copyfile(str(source), str(target))
+        settings.logger.warning("{} does not exist. Try fixing the path in the RST-file.".format(str(source)))
 
 
 def parse_config_file(code_dir, config_path, build_dir):
@@ -586,11 +618,12 @@ def write_rst(raw_dict, param, file_to_write, paths, ending, last_slide_content,
     # for loop goes thought the list of rst files in the project and extract POIs
     # first_slide keeps track if it is on the first slide or not
     first_slide = True
-
+    # for the image paths in the presentation
+    img_list = []
     for file in paths:
         try:
-            first_slide = write_poi(file, file_to_write, transition, first_slide, img_paths, other_transitions,
-                                    raw_dict, step_num)
+            first_slide, img_list = write_poi(file, file_to_write, transition, first_slide, img_paths,
+                                              other_transitions, raw_dict, step_num, img_list)
         except PermissionError as pe:
             settings.logger.error("Permission error while handling {}\nError: {}".format(file, pe))
             exiting()
@@ -603,7 +636,7 @@ def write_rst(raw_dict, param, file_to_write, paths, ending, last_slide_content,
     write_ending(file_to_write, ending, last_slide_content)
     settings.logger.info("\n{} is created.".format(file_to_write))
 
-    return step_num
+    return img_list
 
 
 def selected_rounds(dictionary):
@@ -816,9 +849,10 @@ def create_presentation(args):
             rst_file = raw_dict[settings.files][settings.filename]  # needs to be reassigned if it was changed via cmd
             # arguments
             course_path = raw_dict[settings.files][settings.course_path]
-        write_rst(raw_dict, params, rst_file, pathfinder.create_paths(selected_rounds(raw_dict), course_path, raw_dict[settings.files][settings.language]), ending,
-                  last_slide_content, transition, other_transitions, course_path, step_num)
-        presentation_folder = hover.run(rst_file, raw_dict, build_dir)
+            image_list = write_rst(raw_dict, params, rst_file, pathfinder.create_paths(selected_rounds(raw_dict),
+                                   course_path, raw_dict[settings.files][settings.language]), ending,
+                                   last_slide_content, transition, other_transitions, course_path, step_num)
+        presentation_folder = hover.run(rst_file, raw_dict, build_dir, image_list)
         create_pdf.create(raw_dict, rst_file, presentation_folder, build_dir, code_dir)
     settings.logger.info("If no errors occurred, presentation should be ready.")
     settings.logger.info("Exiting...\n")
