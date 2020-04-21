@@ -155,8 +155,7 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # directives which are handled differently while writing
     directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::', '.. column::', '.. row::', '.. code-block::']
     # If in code block inside POI register it, if code block not in POI ignore
-    code_block = False
-    # exceptions handled for these files in write_rst function
+    code_block = True
 
     with open(file_to_read, 'r') as reader, open(file_to_write, 'a') as writer:
 
@@ -251,7 +250,6 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             writer.write(new + "\n")
                             img_list.append(new_path)
                     elif directive[1] in line:
-                        # strips .. figure from the line so path remains
                         new_path = find_image_path(image_paths, line.split(directive[1])[1])
                         if new_path:
                             new_path = change_path_to_relative(new_path)
@@ -273,9 +271,6 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                     elif directive[4] or directive[5] in line:
                         # row and column
                         writer.write(line)
-                    elif directive[6] in line:
-                        # row and column
-                        code_block = True
                     else:
                         # empty lines need to be written
                         # otherwise some important empty lines will be deleted
@@ -283,29 +278,32 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             writer.write(line)
                         else:
                             writer.write(line[spaces:])
-
+                    if directive[6] in line:
+                        # code-block
+                        code_block = True
             if extract in line:
+                # if not in code block do things normally
+                # if POI then start extract
+                # keeping count of the slides (steps)
+                if not title_option:
+                    # if there is title option this variable will be overwritten by that option value
+                    title = get_title_without_options(line)
+                else:
+                    settings.logger.warning("POI titled: {} has two titles. Please remove other one."
+                                            .format(title[0].rstrip()))
 
-                if not code_block:
-                    # if not in code block do things normally
-                    # if POI then start extract
-                    # keeping count of the slides (steps)
+                if code_block:
+                    start = True
+                else:
                     step_num += 1
                     start = True
                     in_slides = True
 
-                    if not title_option:
-                        # if there is title option this variable will be overwritten by that option value
-                        title = get_title_without_options(line)
-                    else:
-                        settings.logger.warning("POI titled: {} has two titles. Please remove other one."
-                                                .format(title[0].rstrip()))
-
-                    settings.logger.info("\nextracting '{}' from {}".format(title[0].rstrip().lstrip(), file_to_read))
-
+                settings.logger.info("\nextracting {} from {}".format(title[0].rstrip().lstrip(), file_to_read))
         if start:
             # if file has ended unexpectedly, write transition
             transition_line(writer)
+
     return first_slide, img_list
 
 
@@ -593,7 +591,6 @@ def set_defaults(config, config_path, css_path):
                             settings.logger.info("pdf creation method: rst2pdf")
                         else:
                             settings.logger.info("pdf creation method: deck2pdf")
-
         print_dashes()
 
     return config
