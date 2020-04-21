@@ -8,6 +8,7 @@
   * [Prerequisites](#prerequisites)
   * [Installing](#installing)
     + [Virtual environment](#virtual-environment)
+    + [Install Python 3.7 and venv](#install-python-37-and-venv)
     + [Edit course.yml](#edit-courseyml)
     + [Ready to make presentations](#ready-to-make-presentations)
 - [Presentation settings](#presentation-settings)
@@ -20,12 +21,12 @@
     + [All parameters](#all-parameters)
 - [Making presentations](#making-presentations)
   * [HTML presentation](#html-presentation)
-  * [Selecting language for the presentation](#selecting-language-for-the-presentation)
-    + [Parameters](#parameters)
-    + [Configuration file](#configuration-file)
   * [PDF creation](#pdf-creation)
     + [With parameters](#with-parameters)
     + [With configuration file](#with-configuration-file)
+  * [Selecting language for the presentation](#selecting-language-for-the-presentation)
+    + [Parameters](#parameters)
+    + [Configuration file](#configuration-file)
 - [Workflow](#workflow)
     + [HTML presentation](#html-presentation-1)
     + [PDF and HTML presentations](#pdf-and-html-presentations)
@@ -53,7 +54,6 @@
 - [Built With](#built-with)
 - [Authors](#authors)
 
-
 # Introduction
 
 Presentation maker is a tool for making HTML & PDF presentations from multiple of reStructuredText (RST) files that contains directives called point-of-interests (POI). Each POI has at least title and some content in it. It may have images, figures and almost any other type of content which is valid RST. 
@@ -78,9 +78,10 @@ These instructions are for linux.
 
 ## Prerequisites
 - Python 3.7 or above
+- Python 3.7 venv
 - Git
 - Docker
-- [Roman](https://github.com/apluslms/roman)
+- [Roman (versio 0.2.1rc4)](https://github.com/apluslms/roman)
 - You will need [A+ LMS](https://apluslms.github.io/guides/quick/) and A+ course. From this link you will find instructions on how
 to create a demo course.
 - Remember to add `point-of-interest` (Sphinx extension module) in `conf.py` file.
@@ -97,7 +98,7 @@ extensions = [
 'media'
 ]
 ```
-- You will need POI in your A+ course material.
+- You will need POI in your A+ course material since the presentation will be made from them.
 
 ```
 
@@ -112,22 +113,47 @@ This text is no longer part of POI.
 ```
 
 ## Installing
-Open terminal and navigate somewhere where you would like to download Presentation Maker.
 
 ### Virtual environment
+ 
 If you haven't installed Roman yet. It is best to install it in the virtual environment. If you have it already installed then you can skip this step.
 
 Create virtual environment, activate it. Update pip, setuptools and install Roman.
 ```
 # in terminal
-python3 -m venv venv
+python3.7 -m venv venv
 source venv/bin/activate
 
 pip install -U pip 
 pip install -U setuptools
-pip install apluslms-roman
+pip install apluslms-roman==0.2.1rc4
 ```
 
+####If you have trouble getting virtual environment working
+
+###Python3.7 and venv issues
+
+I had to do this in order to get python3.7 to work in venv:
+
+**Find out path to the Python3.7**
+
+`which python3.7`
+
+Copy resulting path to the command below. My path was `/usr/bin/python3.7`
+
+**Install virtualenv**
+
+`pip3 install virtualenv`
+
+**Create virtual environment**
+
+ `python3 -m virtualenv -p /usr/bin/python3.7 venv`
+ 
+**Activate virtual environment**
+
+`source venv/bin/activate`
+
+Now in virtual environment type `python -V`, you should see python 3.7.5
 
 ### Edit course.yml
 - Navigate to the root of your course directory
@@ -149,13 +175,42 @@ steps:
 
 ### Ready to make presentations
 
-Presentation maker is ready to start creating presentations but before making one, it is recommended to make some changes to the configuration file. In the next step we will go through the configuration settings.
+####Run Roman
 
+If you have some POI ready in your course material, then you are ready to create an presentation.
+
+In terminal change directory to the root of your course directory. 
+
+Try running Roman in your terminal. Make sure you have activated virtual environment, if you have it activated you should see `(venv)` at the beginning of the line.
+
+```
+roman
+```
+This is initial run so presentation may not look right. You can see the presentation by opening `index.html` at `A+course/_build/presentation/index.html`.
+ 
+You can change some settings in `presentation_config.yaml` which is in the root of your course directory. Configuration file was also created during this first run.
+
+In next chapter you will learn how to make some changes to the `presentation_config.yaml`.
+
+####Possible errors while running Roman
+
+`ERROR: Unable to find backend 'apluslms_roman.backends.docker.DockerBackend'`
+
+If you get error like this, it means you have installed newest version of roman. Currently it does not work with Presentation Maker.
+
+Try these commands in your virtual environment and try to run roman after installation.
+
+```
+pip uninstall apluslms-roman
+pip install apluslms-roman==0.2.1rc4
+``` 
 
 # Presentation settings 
 
 Don't worry if you don't have the `presentation_config.yaml` yet, it will be created (root of course directory) when you run the Presentation Maker first time.
 Path to the configuration file will look something like this: `a+course/presentation_config.yaml`. After that first run you can start changing some settings in the configuration file.
+
+If you followed the steps in the last chapter you should have `presentation_config.yaml` ready, so you can skip next step.
 
 ## Create presentation_config.yaml
 
@@ -179,6 +234,8 @@ This simply means that if you define title via configuration file and via parame
 
 Best way to use Presentation Maker is to set most of the settings by configuration file and use parameters for smaller changes, like testing some feature, changing language or title.
 
+Let's start editing `presentation_config.yaml`.
+
 1. Set title, subtitle, author, description in the `presentation_config.yaml`
 
     **Note: Title and subtitle will be used to generate the first slide.** 
@@ -199,7 +256,7 @@ Best way to use Presentation Maker is to set most of the settings by configurati
 
     ```
     # content is RST formatted. You may want to change title from "Last slide" to something else
-    # Keep "content: |" as it is since "|" character after the content title allows multiple line input. 
+    # Note: Keep "content: |" as it is since "|" character after the content title allows multiple line input. 
     
     last_slide:
       # impress.js fields can be applied as shown below in comments
@@ -209,12 +266,13 @@ Best way to use Presentation Maker is to set most of the settings by configurati
       # Last slide content. Use normal rst formatting
       content: |
     
-        Last slide
-        ----------
-    
-        `sample link <https://www.aalto.fi>`_
+        Last slide title
+        ----------------
+        
+        Add some content here...
+        `You can change this too <https://www.aalto.fi>`_
     ```
-4. It is recommended to keep files commented out like this. If you ever need to change any of these, just uncomment the line and add changes.
+4. It is recommended to keep these commented out like this. If you ever need to use any of these, just uncomment the line and add changes.
 
     If you want to create pdf (deck2pdf) every time. You have to uncomment `make_pdf` and `rst2pdf`. Then set `make_pdf: True` and `rst2pdf: False`
 
@@ -236,6 +294,8 @@ Best way to use Presentation Maker is to set most of the settings by configurati
 
 ## Course parameters
 
+This is just another way to make changes to the settings. It is not mandatory to do these steps. You can do the same things and more in the `presentation_config.yaml` but sometimes it's more convenient to use course parameters.
+ 
 Go to the root of your course directory.
 
 Open `course.yml`.
@@ -278,6 +338,8 @@ steps:
 Parameter `-r` is used to select rounds.
 
 Rounds can be selected by interval or individually. 
+
+All rounds are selected by default.
 
 For example if I want to include rounds 1 to 5 and 8. 
 
@@ -370,44 +432,6 @@ roman
 
 ```
 
-## Selecting language for the presentation
-
-Some courses may have multiple languages. If this is the case you can set wanted language with parameters or by configuration file.
-
-Note: Finnish is used by default and you do not need to select it specifically.
- 
-### Parameters
-
-Use `-l` parameter to select the language. 
-
-```
-# course.yml - selecting "english" as a language with parameters
----
-version: 2
-
-steps:
-  - img: apluslms/presentation-maker:latest
-    cmd: -l en
-    mnt: /compile
-    
-```
-
-### Configuration file
-
-```
-# in presentation_config.yaml. Setting language to 'en' and save file.
-
-files:
-  # filename: _build/presentation.rst
-  # css: css/presentation.css
-  # course_path: .
-  # make_pdf: True
-  # hovercraft_target_dir: _build/presentation
-  # course_rounds: all
-  # rst2pdf: False
-  language: en
-```
-
 
 ## PDF creation
 
@@ -472,6 +496,45 @@ files:
 ```
 
 No matter which way you made the settings, you should be able to create pdf file along with html presentation by just typing `roman` in the terminal (as long as you are in the root of A+course directory). 
+
+## Selecting language for the presentation
+
+Some courses may have multiple languages. If this is the case you can set wanted language with parameters or by configuration file.
+
+Note: Finnish is used by default and you do not need to select it specifically.
+ 
+### Parameters
+
+Use `-l` parameter to select the language. 
+
+```
+# course.yml - selecting "english" as a language with parameters
+---
+version: 2
+
+steps:
+  - img: apluslms/presentation-maker:latest
+    cmd: -l en
+    mnt: /compile
+    
+```
+
+### Configuration file
+
+```
+# in presentation_config.yaml. Setting language to 'en' and save file.
+
+files:
+  # filename: _build/presentation.rst
+  # css: css/presentation.css
+  # course_path: .
+  # make_pdf: True
+  # hovercraft_target_dir: _build/presentation
+  # course_rounds: all
+  # rst2pdf: False
+  language: en
+```
+
 
 # Workflow
 
@@ -597,7 +660,7 @@ Column widths can be adjusted individually and each column can have different cl
 
 For different background and text colors see [Bootstrap documentation](https://getbootstrap.com/docs/4.2/utilities/colors/) for reference.
 
-Sum of the column widths on each row should be 12, otherwise layout may break. See the example.
+Sum of the column widths on each row should be 12. See the example.
 
 ```
 # See how background color is selected by using Bootstrap classes in the column_class option.
