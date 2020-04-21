@@ -129,7 +129,7 @@ pip install -U setuptools
 pip install apluslms-roman==0.2.1rc4
 ```
 
-####Python3.7 and venv issues
+#### Python3.7 and venv issues
 
 I had to do this in order to get python3.7 to work in venv:
 
@@ -173,7 +173,7 @@ steps:
 
 ## Ready to make presentations
 
-###Run Roman
+### Run Roman
 
 If you have some POI ready in your course material, then you are ready to create an presentation.
 
@@ -190,7 +190,7 @@ You can change some settings in `presentation_config.yaml` which is in the root 
 
 In next chapter you will learn how to make some changes to the `presentation_config.yaml`.
 
-###Possible errors while running Roman
+### Possible errors while running Roman
 
 `ERROR: Unable to find backend 'apluslms_roman.backends.docker.DockerBackend'`
 
@@ -332,7 +332,7 @@ steps:
 ```
 
 
-###  Selecting course rounds for presentation
+### Selecting course rounds for presentation
 Parameter `-r` is used to select rounds.
 
 Rounds can be selected by interval or individually. 
