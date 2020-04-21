@@ -8,7 +8,7 @@
   * [Prerequisites](#prerequisites)
   * [Installing](#installing)
     + [Virtual environment](#virtual-environment)
-    + [Install Python 3.7 and venv](#install-python-37-and-venv)
+    + [Python 3.7 and venv issues](#python3.7-and-venv-issues)
     + [Edit course.yml](#edit-courseyml)
     + [Ready to make presentations](#ready-to-make-presentations)
 - [Presentation settings](#presentation-settings)
@@ -129,9 +129,7 @@ pip install -U setuptools
 pip install apluslms-roman==0.2.1rc4
 ```
 
-####If you have trouble getting virtual environment working
-
-###Python3.7 and venv issues
+####Python3.7 and venv issues
 
 I had to do this in order to get python3.7 to work in venv:
 
@@ -173,9 +171,9 @@ steps:
     
 ```
 
-### Ready to make presentations
+## Ready to make presentations
 
-####Run Roman
+###Run Roman
 
 If you have some POI ready in your course material, then you are ready to create an presentation.
 
@@ -192,7 +190,7 @@ You can change some settings in `presentation_config.yaml` which is in the root 
 
 In next chapter you will learn how to make some changes to the `presentation_config.yaml`.
 
-####Possible errors while running Roman
+###Possible errors while running Roman
 
 `ERROR: Unable to find backend 'apluslms_roman.backends.docker.DockerBackend'`
 
