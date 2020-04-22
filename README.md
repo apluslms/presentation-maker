@@ -77,17 +77,17 @@ nice as deck2pdf generated pdf files. Best to use with simple slides only.
 These instructions are for linux. 
 
 ## Prerequisites
-- Python 3.7 or above
-- Python 3.7 venv
+- Python 3.5 or above
+- Python 3 venv (`apt-get install python3-venv`)
 - Git
 - Docker
-- [Roman (versio 0.2.1rc4)](https://github.com/apluslms/roman)
+- [Roman (version 0.2.1rc4)](https://github.com/apluslms/roman)
 - You will need [A+ LMS](https://apluslms.github.io/guides/quick/) and A+ course. From this link you will find instructions on how
 to create a demo course.
-- Remember to add `point-of-interest` (Sphinx extension module) in `conf.py` file.
+- Remember to add `point_of_interest` (Sphinx extension module) in `conf.py` file.
   
 ```
-# In conf.py - you may have different extensions than below. Just add point-of-interst.
+# In conf.py - you may have different extensions than below. Just add point_of_interest.
 
 extensions = [
 'sphinx.ext.todo',
@@ -112,13 +112,19 @@ This text is no longer part of POI.
 
 ```
 
+## About a-plus-rst-tools
+
+Presentation maker does not depend on the a-plus-rst-tools. However, point-of-interests are written inside the normal A+ chapter RST files that are compiled into the A+ course materials (electronic textbook). Point-of-interests serve two purposes since they can be used inside the course materials and additionally, they can be compiled into a separate presentation with Presentation maker.
+
+Using Presentation maker does not require the a-plus-rst-tools submodule in the course repository, but compiling the course materials does. New features have been added to point-of-interests due to the needs of presentations and thus, compiling the course materials requires a new version of a-plus-rst-tools if the latest features of point-of-interests are used. The latest updates to a-plus-rst-tools are still under development. The official version will be released in the summer 2020.
+
 ## Installing
 
 ### Virtual environment
  
 If you haven't installed Roman yet. It is best to install it in the virtual environment. If you have it already installed then you can skip this step.
 
-Create virtual environment, activate it. Update pip, setuptools and install Roman.
+Create virtual environment, activate it. Update pip, setuptools and install Roman. Roman requires Python 3.5 or newer.
 ```
 # in terminal
 python3.7 -m venv venv
@@ -156,8 +162,8 @@ Now in virtual environment type `python -V`, you should see python 3.7.5
 ### Edit course.yml
 - Navigate to the root of your course directory
 - Open course.yml file
-- find line which starts with `img:` and replace the value with `apluslms/presentation-maker:latest` like in the example below. See [hub.docker.com - presentation-maker](https://hub.docker.com/r/apluslms/presentation-maker) for more info.
-- It is also recommended to add path to the configuration file. If it isn't there already. Default path to the configuration file is in the _build directory inside the course directory.
+- find line which starts with `img:` and replace the value with `apluslms/presentation-maker:latest` like in the example below. The `latest` tag can be replaced with a released version. Different versions of the container are listed in [hub.docker.com - presentation-maker](https://hub.docker.com/r/apluslms/presentation-maker). If you use the `latest` tag, then you should update your local copy of the container by running `docker pull apluslms/presentation-maker:latest`.
+- It is also recommended to add path to the configuration file if it isn't there already. Default path to the configuration file is in the _build directory inside the course directory.
 
 ```
 # after the changes course.yml looks something like this
@@ -670,7 +676,7 @@ Sum of the column widths on each row should be 12. See the example.
 
      .. column::
        :width: 8
-       :column_class: bg-warning
+       :column-class: bg-warning
        
        .col-8
 
@@ -678,19 +684,19 @@ Sum of the column widths on each row should be 12. See the example.
 
          .. column::
            :width: 6
-           :column_class: bg-light
+           :column-class: bg-light
 
            .col-6
 
          .. column::
            :width: 6
-           :column_class: bg-secondary
+           :column-class: bg-secondary
 
            .col-6
 
      .. column::
        :width: 4
-       :column_class: bg-success
+       :column-class: bg-success
 
        .col-4
 
