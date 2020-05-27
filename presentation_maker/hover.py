@@ -10,6 +10,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup as bs
 
 from . import presentation_maker as pm
+from . import create_columns as column
 from . import settings
 
 from docutils import nodes
@@ -172,6 +173,15 @@ def change_paths(rst_file):
     # write changed paths to presentation.rst file.
     with open(rst_file, 'w') as writer:
         writer.writelines(file)
+
+
+def make_columns(filename):
+    """
+    Creates columns if ::newcol option is used inside of point-of-interest in RST material.
+    :param filename:
+    :return:
+    """
+    column.create(filename)
 
 
 def add_bgimg_to_steps(soup):
@@ -342,6 +352,8 @@ def run(filename, dictionary, build_dir):
         handle_images(hovercraft_target_dir, filename)
         hovercraft.main(command)
         html_file = Path(hovercraft_target_dir) / "index.html"
+        if settings.columns:
+            make_columns(str(html_file))
         soup = make_soup(html_file)
         add_bootstrap(soup, html_file)
         if settings.bg_img:
