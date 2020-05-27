@@ -153,6 +153,8 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # if 'not_in_slides' flag is changed in that file, it should be changed here as well.
     not_in_slides = settings.not_in_slides
     # directives which are handled differently while writing
+    # columns in slides.
+    newcol = settings.newcol
     directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::', '.. column::', '.. row::', '.. code-block::']
     # If in code block inside POI register it, if code block not in POI ignore
     code_block = True
@@ -196,6 +198,12 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                             # to provide header to the slide
                             title_option = True
                             title = get_title_from_options(line)
+                        if ":columns:" in line:
+                            settings.column_ratios.append(line.split(":columns:")[1].lstrip().rstrip())
+                        if newcol in line:
+                            settings.columns = True
+                            # keep ::newcol in rst. Later it is easier to know how columns are set
+                            writer.write("\n::newcol\n")
                         if ":bgimg:" in line:
                             if not code_block:
                                 # if poi has background image in it. We need to keep it in rst. It will be used later.
@@ -207,6 +215,7 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
                                     # img_path = line.split(":bgimg:")[1].strip()
                                     # img_list.append(img_path)
                                     img_list.append(new_path)
+
                         if ":math" in line:
                             writer.write(line)
                         if settings.column_width_opt in line:

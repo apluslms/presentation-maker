@@ -139,6 +139,26 @@ a {
     padding: calc(100vh / 4) 0px;
 }
 
+/* Styles for newcol columns */
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: auto;
+}
+
+.column img {
+  align-self: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
 /* TABLE STYLES */
 
 table {

@@ -11,6 +11,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup as bs
 
 from . import presentation_maker as pm
+from . import create_columns as column
 from . import settings
 
 from docutils import nodes
@@ -162,6 +163,13 @@ def hide_header(soup, html_file):
 
     write_to_file(soup, html_file)
 
+def make_columns(filename):
+    """
+    Creates columns if ::newcol option is used inside of point-of-interest in RST material.
+    :param filename:
+    :return:
+    """
+    column.create(filename)
 
 def hide_footer(soup, html_file):
     """
@@ -206,27 +214,16 @@ class Column(Directive):
 
     def run(self):
         if settings.column_width in self.options:
-            col_width = str(self.options[settings.column_width]).strip()
-            if not col_width:
-                # width is empty.
-                col_width = ""
-            else:
-                # not empty
-                col_width = "-" + col_width
+            col_width = str(self.options[settings.column_width])
         else:
-            col_width = ""
-
+            col_width = str(12)
         if settings.column_class in self.options:
             classes = str(self.options[settings.column_class])
-            if not classes:
-                classes = ""
-            else:
-                classes = " " + classes
         else:
             classes = ""
         column_content = '\n'.join(self.content)
         node = nodes.container(column_content)
-        node['classes'] = 'col-sm' + col_width + ' ' + classes
+        node['classes'] = 'col-sm-' + col_width + ' ' + classes
 
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
@@ -256,6 +253,7 @@ def add_bootstrap(soup, filename):
     :return:
     """
 
+    settings.logger.info("Adding bootstrap styles to hovercraft.")
     try:
         new_link = soup.new_tag("link")
         new_link.attrs["crossorigin"] = "anonymous"
@@ -270,6 +268,8 @@ def add_bootstrap(soup, filename):
 
 
 def run(filename, dictionary, build_dir, image_paths):
+    settings.logger.info("Bootstrap added successfully.")
+
     """
     Runs hovercraft command. Creates presentation in presentation folder.
     """
@@ -290,6 +290,8 @@ def run(filename, dictionary, build_dir, image_paths):
         handle_images(hovercraft_target_dir, filename, image_paths)
         hovercraft.main(command)
         html_file = Path(hovercraft_target_dir) / "index.html"
+        if settings.columns:
+            make_columns(str(html_file))
         soup = make_soup(html_file)
         add_bootstrap(soup, html_file)
         if settings.bg_img:
