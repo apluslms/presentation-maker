@@ -21,6 +21,9 @@
     + [All parameters](#all-parameters)
 - [Making presentations](#making-presentations)
   * [HTML presentation](#html-presentation)
+  * [Selecting language for the presentation](#selecting-language-for-the-presentation)
+    + [Parameters](#parameters)
+    + [Configuration file](#configuration-file)
   * [PDF creation](#pdf-creation)
     + [With parameters](#with-parameters)
     + [With configuration file](#with-configuration-file)
@@ -435,7 +438,6 @@ To create HTML presentation you will need to just run `roman`. HTML presentation
 roman
 
 ```
-
 
 ## PDF creation
 
