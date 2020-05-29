@@ -664,7 +664,7 @@ Multiple columns and rows can be added to the slides. Rows and columns can be ne
 
 Column widths can be adjusted individually and each column can have different classes for styling. Different Bootstrap classes can be added to each column to create unique content. 
 
-For different background and text colors see [Bootstrap documentation](https://getbootstrap.com/docs/4.2/utilities/colors/) for reference.
+For different background and text colors see [Bootstrap documentation](https://getbootstrap.com/docs/3.4/css/#helper-classes-backgrounds) for reference.
 
 Sum of the column widths on each row should be 12. See the example.
 

@@ -155,7 +155,8 @@ def write_poi(file_to_read, file_to_write, transition, first_slide, image_paths,
     # directives which are handled differently while writing
     # columns in slides.
     newcol = settings.newcol
-    directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::', '.. column::', '.. row::', '.. code-block::']
+    directive = ['.. image::', '.. figure::', '.. youtube::', '.. local-video::', '.. column::', '.. row::',
+                 '.. code-block::']
     # If in code block inside POI register it, if code block not in POI ignore
     code_block = True
 
@@ -444,13 +445,13 @@ def copy_file(source, target):
             # if file has not changed then skip.
             pass
         else:
-                if not source == target:
-                    settings.logger.info("Copying {} to {}".format(source, Path.cwd() / target))
-                    if not target.parent.is_dir():
-                        target.parent.mkdir(parents=True)
-                        copyfile(str(source), str(target))
-                    else:
-                        copyfile(str(source), str(target))
+            if not source == target:
+                settings.logger.info("Copying {} to {}".format(source, Path.cwd() / target))
+                if not target.parent.is_dir():
+                    target.parent.mkdir(parents=True)
+                    copyfile(str(source), str(target))
+                else:
+                    copyfile(str(source), str(target))
     else:
         settings.logger.warning("{} does not exist. Try fixing the path in the RST-file.".format(str(source)))
 

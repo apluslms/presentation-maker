@@ -163,6 +163,7 @@ def hide_header(soup, html_file):
 
     write_to_file(soup, html_file)
 
+
 def make_columns(filename):
     """
     Creates columns if ::newcol option is used inside of point-of-interest in RST material.
@@ -170,6 +171,7 @@ def make_columns(filename):
     :return:
     """
     column.create(filename)
+
 
 def hide_footer(soup, html_file):
     """
