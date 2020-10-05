@@ -16,9 +16,6 @@ ARG PYTHON_BUILD_DEPS="build-essential libbz2-dev libc6-dev libgdbm-dev libncurs
 
 # "mkdir -p /usr/share/man/man1" is needed because the java package fails
 # to install otherwise.
-# git is currently needed to install the rst2pdf pip package from Github.com
-# because only the master branch supports Python 3. They will eventually release
-# a new version officially.
 # Java and JavaFX are needed for the deck2pdf tool that converts HTML files to PDFs.
 # xvfb is needed to run JavaFX applications since they require a display.
 # Python 3.6 or newer is needed for rst2pdf. Python 3.6 is compiled from
@@ -31,7 +28,6 @@ RUN mkdir -p /usr/share/man/man1 \
     apt-utils \
     ca-certificates \
     curl \
-    git \
     openjdk-8-jdk-headless \
     openjfx \
     xvfb \
@@ -54,7 +50,7 @@ RUN mkdir -p /usr/share/man/man1 \
   && rm -rf /tmp/presentation-maker \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
   && rm -rf /root/.cache \
-  && apt-get purge -qqy git $PYTHON_BUILD_DEPS
+  && apt-get purge -qqy $PYTHON_BUILD_DEPS
 
 # pip install from repo URL
 # pip3 install --no-cache-dir --disable-pip-version-check \
