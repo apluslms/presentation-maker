@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name="presentation_maker",
-    version="0.0.1",
+    version="1.0.0",
     author="Juuso Vuorenmaa",
     author_email="juuso.vuorenmaa@aalto.fi",
     description="Tool for making HTML & PDF presentations from A+ course materials written in ReStructuredText.",
