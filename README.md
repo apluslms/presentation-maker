@@ -165,7 +165,7 @@ Now in virtual environment type `python -V`, you should see python 3.7.5
 ### Edit course.yml
 - Navigate to the root of your course directory
 - Open course.yml file
-- find line which starts with `img:` and replace the value with `apluslms/presentation-maker:latest` like in the example below. The `latest` tag can be replaced with a released version. Different versions of the container are listed in [hub.docker.com - presentation-maker](https://hub.docker.com/r/apluslms/presentation-maker). If you use the `latest` tag, then you should update your local copy of the container by running `docker pull apluslms/presentation-maker:latest`.
+- find line which starts with `img:` and replace the value with `apluslms/compile-presentation:latest` like in the example below. The `latest` tag can be replaced with a released version. Different versions of the container are listed in [hub.docker.com - compile-presentation](https://hub.docker.com/r/apluslms/compile-presentation). If you use the `latest` tag, then you should update your local copy of the container by running `docker pull apluslms/compile-presentation:latest`.
 - It is also recommended to add path to the configuration file if it isn't there already. Default path to the configuration file is in the _build directory inside the course directory.
 
 ```
@@ -174,7 +174,7 @@ Now in virtual environment type `python -V`, you should see python 3.7.5
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -y "presentation_config.yaml"
     mnt: /compile
     
@@ -313,7 +313,7 @@ Open `course.yml`.
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -t "Example title" -v -l en -y "path/to/your/custom/presentation_config.yaml"
     mnt: /compile
     
@@ -334,7 +334,7 @@ Let's change these:
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -t "Example title" -s "Example subitle" -a "John Doe" -r 1
     mnt: /compile
     
@@ -454,7 +454,7 @@ By default **rst2pdf** is selected as a main pdf creator. You can use it with ju
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -p
     mnt: /compile
     
@@ -470,7 +470,7 @@ By using parameters `-p` and `-m`. PDF creation can be toggled on and creation m
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -p -m
     mnt: /compile
     
@@ -519,7 +519,7 @@ Use `-l` parameter to select the language.
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -l en
     mnt: /compile
     
@@ -579,7 +579,7 @@ roman
 version: 2
 
 steps:
-  - img: apluslms/presentation-maker:latest
+  - img: apluslms/compile-presentation:latest
     cmd: -p -m
     mnt: /compile
     
@@ -710,7 +710,7 @@ Result
 ## Videos in slides
 
 Local videos and youtube videos can be used in the presentation.
-[More here...](https://github.com/Aalto-LeTech/a-plus-rst-tools#user-content-16-media-directives)
+[More here...](https://github.com/apluslms/a-plus-rst-tools#user-content-16-media-directives)
 
 ### Youtube
 
@@ -845,7 +845,7 @@ You can use style the table content like any other RST content.
 ```
 # in presentation-maker directory
 
-docker build -f docker/compile/Dockerfile -t apluslms/presentation-maker:latest .
+docker build -f docker/compile/Dockerfile -t apluslms/compile-presentation:latest .
 ```
 
 # Troubleshooting
@@ -861,7 +861,7 @@ In this case you may need to edit `course.yml` file and add path to the configur
     version: 2
     
     steps:
-      - img: apluslms/presentation-maker:latest
+      - img: apluslms/compile-presentation:latest
         cmd: -y "_build/presentation_config.yaml"
         mnt: /compile
 

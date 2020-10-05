@@ -58,7 +58,7 @@ RUN mkdir -p /usr/share/man/man1 \
 
 # pip install from repo URL
 # pip3 install --no-cache-dir --disable-pip-version-check \
-# "https://github.com/Aalto-LeTech/presentation-maker/archive/0.0.1.zip" \
+# "https://github.com/apluslms/presentation-maker/archive/1.0.0.zip" \
 
 WORKDIR /compile
 VOLUME /compile

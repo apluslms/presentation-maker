@@ -15,7 +15,7 @@ setup(
     description="Tool for making HTML & PDF presentations from A+ course materials written in ReStructuredText.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Aalto-LeTech/presentation-maker.git",
+    url="https://github.com/apluslms/presentation-maker.git",
     packages=find_packages(),
     python_requires='>=3.6',
     package_data={
