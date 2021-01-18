@@ -146,7 +146,7 @@ def remake_paths(index_path, paths, language):
                 path_list.append(str(p))
             else:
                 if settings.verbose:
-                    settings.logger.info("File {} not found, skipping...".format(f))
+                    settings.logger.info("File {} not found, skipping...".format(file))
     return path_list
 
 
