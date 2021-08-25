@@ -1,5 +1,7 @@
 # Presentation maker
 
+**This project has been archived and it is not under development any longer.**
+
 ## Table of contents
 
 - [Introduction](#introduction)
